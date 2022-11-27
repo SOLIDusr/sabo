@@ -1,4 +1,6 @@
 import discord
+import disnake
+from disnake.ext import commands
 import sqlite3
 from discord.ext import commands
 from config import *
@@ -8,7 +10,7 @@ import random
 
 # Создание intents для работы с намерениями
 intents = discord.Intents.all()
-q = 0
+
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
 
 data_base = sqlite3.connect('bot_test.db', timeout=10)
@@ -48,12 +50,13 @@ async def on_voice_state_update(member, before, after):
     elif before.channel is not None and after.channel is None and author in tdict:
         t2 = time.time() 
         t3 = t2-tdict[author]
+        
         global qwe
         q = math.ceil(t3)# Округление времени в войсе
-        print(q) #10 за минуту
         qe = q / 60 #Первод секунд в минуту
         qwe = math.ceil(qe) #Округление 
         
+       
 
 @bot.command()
 async def work(ctx):
@@ -68,6 +71,36 @@ async def work(ctx):
             embed.add_field(name='Баланс был пополнен на:', value=f'{qwer} SH', inline=False)
             await ctx.send(embed=embed)
         data_base.commit()
+    
+@bot.command()
+async def ahelp(ctx):
+    await ctx.send('Help')
+    await ctx.send('1. "$casinohelp" - Узнать о том какие игры есть на сервере и как они работают.:leaves:')
+    await ctx.send('2. "$SHhelp" - Узнать о том что за валюта есть на данном сервере и все о ней.:leaves:')
+
+@bot.command()
+async def SHhelp(ctx):
+    await ctx.send('Валюта данного сервера - "SH". Чтобы ее получить нужно находиться в войсе. Налисление происходит с помощью команды "$work" после выхода из войса.:leaves:')
+    await ctx.send('1 минута в войсе = 10 SH.:leaves:')
+    await ctx.send('Для чего нужна данная валюта?:leaves:')
+    await ctx.send('В данный момент на нее можно только играть в казино, в будущем планируется добавления нескольких вариантов тратить SH.:leaves:')
+    await ctx.send('1. Создание личного голосового чата , поддержание его за SH (Если валюты не будет хватать , войс будет удален).:leaves:')
+    await ctx.send('2. Покупка различных ролей а так же создание кастомной роли.:leaves:')
+
+
+@bot.command()
+async def casinohelp(ctx):
+    await ctx.send('Помощь по Casino.')
+    await ctx.send('В данном боте есть 2 вида игры в казино на данный момент.')
+    await ctx.send('1. "$casino ставка", в данной игре при победе вы получаете x2 от ставки, в случае проигрыша отнимается сумма вашей ставки. Так же есть шанс словить "JACKPOT", а приз там весьма неплохой.:leaves:')
+    await ctx.send('2. "$roulette ставка число". В данной игре рандомно выпадает число от 0 до 36, вы пытаетесь угадать что выпадет и в случае победы вы получаете x36 от суммы ставки.:leaves:')
+    await ctx.send('Откуда брать валюту для игры в Казино?:leaves:')
+    await ctx.send('"$SHhelp"')
+
+    
+
+
+
 
 
 @bot.command(aliases = ['Казино', 'казино', 'casino', 'Casino']) # Казино 
