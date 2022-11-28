@@ -32,9 +32,6 @@ async def on_ready():
                 pass
             data_base.commit()
 
-
-
-    
     
 
 @bot.event
@@ -67,19 +64,6 @@ async def on_voice_state_update(member, before, after):
                 cursor.execute(f'UPDATE users SET money={(vtimer) + row[0]} where id={member.id}')
             data_base.commit()
        
-
-@bot.command()
-async def work(ctx):
-    if vtime <= 1: # Проверка на время в войсе (Менее одной минуты или нет)
-        await ctx.send("Недостаточно проведено времени в голосовом канале.") # Надо доделать ( не выводит )
-    elif vtime > 1:
-        vtimer = vtime * 5 # Начисление за проведенный промежуток времени
-        for row in cursor.execute(f'SELECT money FROM users where id={ctx.author.id}'):
-            cursor.execute(f'UPDATE users SET money={(vtimer) + row[0]} where id={ctx.author.id}')
-            embed = discord.Embed(title=f'Пополнение баланса...', color=0x42f566)
-            embed.add_field(name='Баланс был пополнен на:', value=f'{vtimer} SH', inline=False)
-            await ctx.send(embed=embed)
-        data_base.commit()
     
 @bot.command()
 async def ahelp(ctx):
