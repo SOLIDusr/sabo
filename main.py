@@ -1,10 +1,10 @@
+from typing import Any
+
 import discord
-import disnake
-from disnake.ext import commands
+# import disnake
+# from disnake.ext import commands
 import sqlite3
 from discord.ext import commands
-from config import *
-import time
 import math
 import random
 
@@ -38,7 +38,6 @@ async def on_ready():
 async def on_ready():
     print('Bot Connected')
     global tdict
-    tdict = {}
     await bot.change_presence(activity = discord.Game('r!help'))
 
 @bot.event # Узнает время в войсе
