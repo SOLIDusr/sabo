@@ -34,14 +34,7 @@ async def on_ready():
     await bot.change_presence(activity = discord.Game('r!help'))
     for guild in bot.guilds:
         print(f'Connected to server, id is: {guild.id}')
-        for member in guild.members:
-            cursor.execute(f"SELECT id FROM users where id={member.id}")
-            if cursor.fetchone() is None:
-                cursor.execute(
-                    f"INSERT INTO users VALUES ({member.id}, '{member.name}', '<@{member.id}>', 0)")
-            else:
-                pass
-            data_base.commit()
+        
 
 
 @bot.event # Узнает время в войсе
@@ -77,50 +70,57 @@ class Info(commands.Cog):
 
     @commands.command()
     async def Shelp(self, ctx):
-        await ctx.send('Help')
-        await ctx.send('1. "/casinohelp" - Узнать о том какие игры есть на сервере и как они работают.:leaves:')
-        await ctx.send('2. "/Valhelp" - Узнать о том что за валюта есть на данном сервере и все о ней.:leaves:')
-        await ctx.send('3. "/rolehelp" - Узнать о покупке кастомной роли.:leaves:')
-        await ctx.send('4. "/voicehelp" - Узнать о покупке личного голосового канала.:leaves:')
+        he1 = discord.Embed(title="Основные команды", colour=discord.Colour(0x3e038c))
+
+        he1.add_field(name='/casinohelp', value="Узнать о том какие игры есть на сервере и как они работают.:leaves:", inline=False)
+        he1.add_field(name='/Valhelp', value="Узнать о том что за валюта есть на данном сервере и все о ней.:leaves:", inline=False)
+        he1.add_field(name='/rolehelp', value="Узнать о покупке кастомной роли.:leaves:", inline=False)
+        he1.add_field(name='/voicehelp', value="Узнать о покупке личного голосового канала.:leaves:", inline=False)
+        await ctx.send(embed=he1)
 
 
     @commands.command()
     async def Valhelp(self, ctx):
-        await ctx.send('Валюта данного сервера - "SH". Чтобы ее получить нужно находиться в войсе.:leaves:')
-        await ctx.send('1 минута в войсе = 50 SH.:leaves:')
-        await ctx.send('Для чего нужна данная валюта?:leaves:')
-        await ctx.send('В данный момент на нее можно только играть в казино, в будущем планируется добавления нескольких вариантов тратить SH.:leaves:')
-        await ctx.send('1. Создание личного голосового чата , поддержание его за SH (Если валюты не будет хватать , войс будет удален).:leaves:')
-        await ctx.send('2. Покупка различных ролей а так же создание кастомной роли.:leaves:')
-
+        he1 = discord.Embed(title="VoiceHelp", colour=discord.Colour(0x3e038c))
+        he1.add_field(name='Валюта данного сервера - "SH".', value="Чтобы ее получить нужно находиться в войсе.:leaves:", inline=False)
+        he1.add_field(name='Система начисления.', value="1 минута в войсе = 50 SH.:leaves:", inline=False)
+        he1.add_field(name='Для чего нужна данная валюта?:leaves:', value="В данный момент на нее можно только играть в казино, в будущем планируется добавления нескольких вариантов тратить SH.:leaves:", inline=False)
+        he1.add_field(name='Первый вариант.', value="Создание личного голосового чата , поддержание его за SH (Если валюты не будет хватать , войс будет удален).:leaves:", inline=False)
+        he1.add_field(name='Второй вариант.', value="Покупка различных ролей а так же создание кастомной роли.:leaves:", inline=False)
+        await ctx.send(embed=he1)
 
     @commands.command()
     async def casinohelp(self, ctx):
-        await ctx.send('Помощь по Casino.')
-        await ctx.send('В данном боте есть 2 вида игры в казино на данный момент.')
-        await ctx.send('1. "$casino ставка", в данной игре при победе вы получаете x2 от ставки, в случае проигрыша отнимается сумма вашей ставки. Так же есть шанс словить "JACKPOT", а приз там весьма неплохой.:leaves:')
-        await ctx.send('2. "$roulette ставка число". В данной игре рандомно выпадает число от 0 до 36, вы пытаетесь угадать что выпадет и в случае победы вы получаете x36 от суммы ставки.:leaves:')
-        await ctx.send('Откуда брать валюту для игры в Казино?:leaves:')
-        await ctx.send('"$Valhelp"')
+        he1 = discord.Embed(title="CasinoHelp", colour=discord.Colour(0x3e038c))
+        he1.add_field(name='Игры Casino:', value="--->", inline=False)
+        he1.add_field(name='Первая игра.', value='/casino ставка.''В данной игре при победе вы получаете x2 от ставки, в случае проигрыша отнимается сумма вашей ставки. Так же есть шанс словить "JACKPOT", а приз там весьма неплохой.:leaves:', inline=False)
+        he1.add_field(name='Вторая игра.', value="/roulette ставка число.""В данной игре рандомно выпадает число от 0 до 36, вы пытаетесь угадать что выпадет и в случае победы вы получаете x36 от суммы ставки.:leaves:", inline=False)
+        he1.add_field(name='Откуда брать валюту для игры в Казино?:leaves:', value="/Valhelp", inline=False)
+        await ctx.send(embed=he1)
 
 
     @commands.command()
     async def rolehelp(self, ctx):
-        await ctx.send('Так как на сервере есть возможность создания кастомной роли , нужно знать несколько вещей.')
-        await ctx.send('Начнем с ценника, стоимость данной услуги составляет 500.000 SH, дорого , но сделано это чтобы у каждого второго не было своей роли, это предаст обладателям кастомной роли некий эксклюзив.')
-        await ctx.send('Создание роли выполняется командой "/newrole Название роли"')
-        await ctx.send('Роль создается "Дефолтной", так что после покупки вы можете обратиться к @St1zy3 для редакции вашей роли (Цвет, значимость)')
-        await ctx.send('Под значимостью мы подразумеваем то, что роль будет находиться выше остальных и тем самым будет выделять вас.')
-
+        he1 = discord.Embed(title="RoleHelp", colour=discord.Colour(0x3e038c))
+        he1.add_field(name='Кастомные роли.', value="На нашем сервере есть возможность создать свою роль.", inline=False)
+        he1.add_field(name='Цена.', value='Начнем с ценника, стоимость данной услуги составляет 500.000 SH, дорого , но сделано это чтобы у каждого второго не было своей роли, это предаст обладателям кастомной роли некий эксклюзив.', inline=False)
+        he1.add_field(name='Создание роли.', value="Создание роли выполняется командой '/newrole Название роли'", inline=False)
+        he1.add_field(name='Создал роль. Что дальше?', value="Роль создается 'Дефолтной', так что после покупки вы можете обратиться к @St1zy3 для редакции вашей роли (Цвет, значимость)", inline=False)
+        he1.add_field(name='Значимость роли', value='Под значимостью мы подразумеваем то, что роль будет находиться выше остальных и тем самым будет выделять вас.', inline=False)
+        await ctx.send(embed=he1)
 
     @commands.command()
     async def voicehelp(self, ctx):
-        await ctx.send('На нашем сервере есть возможность создавать личный голосовой канал.')
-        await ctx.send('Создание происходит командой "/create_voice", стоимость создания составляет 10.000 SH.')
-        await ctx.send('Личную комнату нужно оплачивать, иначе она будет удалена.')
-        await ctx.send('После создания личной комнаты у вас будет 24 часа на оплату. Оплата недельная , стоимость 7 дней составяет 20.000 SH.')
-        await ctx.send('Оплатить комнату можно командой "/payment".')
-        await ctx.send('Хочу подчеркнуть , что пока вы (Создатель комнаты) находитесь в своей комнате , SH вы получать не будете(Данный пункт в разработке).')
+        he1 = discord.Embed(title="VoiceHelp", colour=discord.Colour(0x3e038c))
+        he1.add_field(name='Личная комната.', value="На нашем сервере есть возможность создать свою личную комнату.", inline=False)
+        he1.add_field(name='Как создать свою личную комнату?', value='Создание происходит командой "/create_voice", стоимость создания составляет 10.000 SH.', inline=False)
+        he1.add_field(name='Оплата личной комнаты.', value="Личную комнату нужно оплачивать, иначе она будет удалена.", inline=False)
+        he1.add_field(name='Создал комнату. Что дальше?', value="После создания личной комнаты у вас будет 24 часа на оплату. Оплата недельная , стоимость 7 дней составяет 20.000 SH.", inline=False)
+        he1.add_field(name='Как оплатить свою комнату?', value='Оплатить комнату можно командой "/payment".', inline=False)
+        he1.add_field(name='Команды управления комнатой.', value='В данный момент есть 2 команды : "/open" - открыть комнату(зайти может каждый), "/lock" - закрыть комнату (никто не может попасть в вашу комнату).', inline=False)
+        he1.add_field(name='Могу ли я зарабатывать SH пока нахожусь в своей комнате?', value='Да, можете.', inline=False)
+        await ctx.send(embed=he1)
+       
         
 
 class Gambling(commands.Cog):
@@ -189,7 +189,7 @@ class Gambling(commands.Cog):
     async def roulette(self, ctx, amount: int = None, count: int = None):
         connection = sqlite3.connect('bot_test.db')
         cursor = connection.cursor()
-
+        
         number = random.randint(0, 36)
         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
 
@@ -299,6 +299,7 @@ async def create_voice(ctx,channel_name):
         #number = 1
         pay = 20000 # Сумма которая будет отниматься за недельную оплату
         await ctx.send("У вас есть 24 часа для того чтобы оплатить голосовой канал, иначе он будет удален.")
+        await ctx.send("Управлять каналом можно с помощью команды '/voicemenu'")
         
 
         def countdown(num_of_secs = 86400): #таймер, количество секунд (num_of_secs), до которого будет отсчитывать таймер (24 часа). (86400)
@@ -332,55 +333,78 @@ async def create_voice(ctx,channel_name):
                     
         countdown()    
 
-
 @bot.event 
 async def on_voice_state_update(member, before, after): #Удаляет войс 
-   
-    if g < 20000: # Если денег на Payment нет , - войс
+    
+    k = int(g)
+    if k < 20000: # Если денег на Payment нет , - войс
         cchanelid = channelid
         channel = bot.get_channel(cchanelid)
         await channel.delete()
+    else:
+        pass
 
+#@bot.command(name="role") # Выдает тегнутую роль 
+async def role(ctx, role: discord.Role):
+    if role in ctx.author.roles:
+        await ctx.author.remove_roles(role)
+    else:
+        await ctx.author.add_roles(role)
+        await ctx.send("Роль выдана!")
 
-@bot.command() 
-async def newrole(ctx, *,rolename=None): 
+ 
+@bot.command()  # Имба создание роли
+async def buyrole(ctx, *,content): 
     connection = sqlite3.connect('bot_test.db')# Подключение к бд
     cursor = connection.cursor()
-    rolepay = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]# Присваиваем переменную 
-    op = int(rolepay)
-    roleprice = 500000
-    if op > 500000: # если денег хватает, идем дальше
-        if not rolename:
-            embed = discord.Embed(
-            title="Введите название роли.",
-            )
-            await ctx.send(embed=embed)
-        
-        else:
-            cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(roleprice, ctx.author.id))
-            role = await ctx.guild.create_role(name=rolename, mentionable=True)
-            cust = role
-            await ctx.author.add_roles(role)
-            embed = discord.Embed(
-            title=f"Вы успешно создали роль. Для редакции роли обратитесь к @St1zy3"
-            )
-            await ctx.send(embed=embed)
-            customrole = {role.mention}
-
-    elif op < 500000: # Денег нехватает 
-        embed = discord.Embed(
-        title="Недостаточно средств.",
-        )
-        await ctx.send(embed=embed)
-
+    a = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]# Присваиваем переменную 
+    oplata = 500000
+    op = a
+    connection.commit()
+    if op < 500000:
+        await ctx.send("Недостаточно средств.")
+    elif op >= 500000:
+        cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(oplata, ctx.author.id))
+        guild = ctx.guild
+        role = await guild.create_role(name=content)  
+        roleid = role.id
+        await ctx.author.add_roles(role)
+        description = f'''
+        **Name:** <@{roleid}>
+        **Created by:** {ctx.author.mention}
+        '''
+        await ctx.author.add_roles(role)
+        await ctx.send("Роль была создана и выдана. Для редакции обратитесь к @St1zy3 ")
+        print(roleid)
     
 
 
 @bot.command() # Панель управления созданным войсом.
 async def voicemenu(ctx):
     await ctx.send("Команды упавления личным голосовым чатом.") 
+    await ctx.send(" '/lock' - закрывает доступ к комнате.")
+    await ctx.send(" '/unlock' - открывает доступ к комнате.")
+
+#lock
+@bot.command(pass_context=True)
+@commands.has_permissions(manage_channels=True)
+async def lock(ctx):
+    await ctx.channel.purge (limit=1)
+    channel = ctx.message.author.voice.channel
+    overwrite = channel.overwrites_for(ctx.guild.default_role)
+    overwrite.connect = False
+    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
 
+#unlock
+@bot.command(pass_context=True)
+@commands.has_permissions(manage_channels=True)
+async def unlock(ctx):
+    await ctx.channel.purge (limit=1)
+    channel = ctx.message.author.voice.channel
+    overwrite = channel.overwrites_for(ctx.guild.default_role)
+    overwrite.connect = True
+    await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
 
 
 @bot.command()
@@ -402,6 +426,54 @@ async def payment(ctx, Oplata):
     elif balance < aoplata:
         await ctx.send("Недостаточно средств!")
 
+@bot.event 
+async def on_voice_state_update(member, before, after): 
+    connection = sqlite3.connect('bot_test.db')# Подключение к бд
+    cursor = connection.cursor()
+
+    author = member.id
+    if before.channel is None and after.channel is not None:
+       
+        t1 = time.time()
+        tdict[author] = t1
+    elif before.channel is not None and after.channel is None and author in tdict:
+        t2 = time.time() 
+        
+        t3 = t2-tdict[author]
+        
+        l = math.ceil(t3)
+        
+        if l >=60: # Минуты
+            p = l / 60 
+            min = cursor.execute("SELECT voicetimemin FROM users WHERE id = {}".format(member.id)).fetchone()[0]# Присваиваем переменную 
+            cursor.execute("UPDATE users SET voicetimemin = voicetimemin + {} WHERE id = {}".format(p, member.id)) 
+            if p >= 10:
+                ex = p * 2
+                exp = cursor.execute("SELECT exp FROM users WHERE id = {}".format(member.id)).fetchone()[0]# Присваиваем переменную 
+                cursor.execute("UPDATE users SET exp = exp + {} WHERE id = {}".format(ex, member.id)) 
+        elif l >= 3600: # Часы
+            p = l / 3600
+            hour = cursor.execute("SELECT voicetimehour FROM users WHERE id = {}".format(member.id)).fetchone()[0]# Присваиваем переменную 
+            cursor.execute("UPDATE users SET voicetimehour = voicetimehour + {} WHERE id = {}".format(p, member.id))
+        else: # Секунды
+            pass
+
+
+
+@bot.command()
+async def profile(ctx):
+    connection = sqlite3.connect('bot_test.db')# Подключение к бд
+    cursor = connection.cursor()
+    profilenick = cursor.execute("SELECT nickname FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+    profilebalance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+    profilevoicetimehour = cursor.execute("SELECT voicetimehour FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+    profilevoicetimemin = cursor.execute("SELECT voicetimemin FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+    profilevoicetimesec = cursor.execute("SELECT voicetimesec FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+    profilelvl = cursor.execute("SELECT lvl FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+    await ctx.send("Никнейм:" + profilenick)
+    await ctx.send(profilebalance) # баланс
+    await ctx.send( profilevoicetimehour + profilevoicetimemin + profilevoicetimesec) # время в войсе
+    await ctx.send(profilelvl) # лвл
 
 
 bot.run(settings['token'])
