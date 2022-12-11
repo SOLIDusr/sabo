@@ -4,9 +4,7 @@ from discord.ext import commands
 from config import *
 import time
 import math
-import random
 import os
-
 
 intents = discord.Intents.all()
 
@@ -22,11 +20,6 @@ global Oplata  # Переменная в которой будет хранит�
 global vtime
 
 
-if __name__ == "__main__":
-    for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
-        if filename.endswith(".py"):
-            bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
-
 # bot.event
 @bot.event
 async def on_ready():
@@ -36,13 +29,13 @@ async def on_ready():
     print('Bot Connected')
     global tdict
     tdict = {}
-    # await bot.add_cog(Info())
-    await bot.add_cog(Gambling())
-    await bot.add_cog(CommandsMoney())
-    await bot.add_cog(CommandsRoles())
-    await bot.change_presence(activity=discord.Game('/Shelp'))
+    await bot.change_presence(activity=discord.Game('/help'))
     for guild in bot.guilds:
         print(f'Connected to server, id is: {guild.id}')
+    if __name__ == "__main__":
+        for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
+            if filename.endswith(".py"):
+                await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
 
 
 # @bot.event
@@ -60,430 +53,293 @@ async def on_ready():
 @bot.event  # Узнает время в войсе
 async def on_voice_state_update(member, before, after):
     payment2 = int(payment1)
+
     if payment2 < 12000:  # Если денег на Payment нет , - войс
+
         cchanelid = channelid
         channel = bot.get_channel(cchanelid)
         await channel.delete()
+
     else:
+
         pass
 
     author = member.id
+
     if before.channel is None and after.channel is not None:
+
         t1 = time.time()
         tdict[author] = t1
+
     elif before.channel is not None and after.channel is None and author in tdict:
+
         t2 = time.time()
         t3 = t2 - tdict[author]
         tround = math.ceil(t3)
         vtim = tround / 60
         vtime = math.ceil(vtim)
+
         if vtime <= 1:  # Проверка на время в войсе (Менее одной минуты или нет)
+
             pass
+
         elif vtime > 1:
+
             vtimer = vtime * 10  # Начисление за проведенный промежуток времени
+
             for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
                 cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
+
             data_base.commit()
 
 
-@bot.command()  # Команда загружает расширения
-async def ext_load(ctx):
-    for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
-        if filename.endswith(".py"):
-            await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
-
-
 @bot.command()
-async def ext_unload(ctx):  # Выгружает расширения, отключает
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            await bot.unload_extension(f"cogs.{filename[:-3]}")
+async def plugin(ctx, todo: str = None):
+    todos = ['-l', '-r', '-u']
 
+    if todo is None:
 
-@bot.command()
-async def ext_reload(ctx):  # Перезагрузка КОГов, hot reload
-    for filename in os.listdir("./cogs"):
-        if filename.endswith(".py"):
-            await bot.reload_extension(f"cogs.{filename[:-3]}")
+        for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
 
-class Gambling(commands.Cog):
-    def __init__(self):
-        self.bot = bot
+            if filename.endswith(".py"):
+                await ctx.send(f'Плагин - {filename[:-3]} существует!')
 
-    @commands.command(aliases=['Казино', 'казино', 'casino', 'Casino'])
-    async def __casino(self, ctx, amount: int = None):
+        await ctx.send('/plugin -l чтобы загрузить')
 
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        number = random.randint(1, 100)
-        jackpot = random.randint(5000, 20000)
-        balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        # Условия и т.д
-        if amount is None:
-            he1 = discord.Embed(title="[CASINO]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='[Ошибка]', value="Вы забыли указать ставку!", inline=False)
-            await ctx.send(embed=he1)
-        elif amount > balance or amount < 0:
-            he1 = discord.Embed(title="[CASINO]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='[Ошибка]', value="Недостаточно средств.", inline=False)
-            await ctx.send(embed=he1)
-        elif balance <= 0:
-            he1 = discord.Embed(title="[CASINO]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='[Ошибка]', value="Недостаточно средств.", inline=False)
-            await ctx.send(embed=he1)
-        else:
-            if number < 50:
-                cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
-                await ctx.send(embed=embed)
-            elif number == 93:
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(jackpot, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='О боже мой!!! Вы выйграли JACKPOT, мы добавили вам на баланс:',
-                                value=f'{jackpot} SH', inline=False)
-                await ctx.send(embed=embed)
-            elif number == 27:
-                he1 = discord.Embed(title="[CASINO]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='[Итог]', value="Вам попалось SAFE-ЯЧЕЙКА, вы не потеряли свой баланс.",
-                              inline=False)
-                await ctx.send(embed=he1)
-            elif number == 13:
-                he1 = discord.Embed(title="[CASINO]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='[Итог]', value="Вам попалось SAFE-ЯЧЕЙКА, вы не потеряли свой баланс.",
-                              inline=False)
-                await ctx.send(embed=he1)
-            else:
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount} SH', inline=False)
-                await ctx.send(embed=embed)
+    if todo is not None and todo not in todos:
 
-    @commands.command()
-    async def roulette(self, ctx, amount: int = None, count: int = None):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        number = random.randint(0, 36)
-        balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        if amount is None:
-            await ctx.send("Вы забыли указать ставку!")
-        elif count is None:
-            await ctx.send("Нужно выбрать на что ставить.")
-        elif count > 36 or count < 0:
-            await ctx.send("Нужно выбрать число от 0 до 36")
-        elif amount > balance or amount < 0:
-            await ctx.send("Недостаточно :leaves:, иди на работу.")
-        elif balance <= 0:
-            await ctx.send("Недостаточно :leaves:, иди на работу.")
-        else:
-            if count != number:
-                cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
-                embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
-                await ctx.send(embed=embed)
-            elif count == number:
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(amount * 36, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount * 36} SH', inline=False)
-                embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
-                await ctx.send(embed=embed)
+        emb = discord.Embed(title='[ERROR] plugin', description=f'{ctx.author.mention}, Укажите приемлемое действие',
+                            colour=discord.Colour(0xe73c3c))
+        emb.add_field(name='Действия:', value='-r - restart, -l - load, -u - unload', inline=False)
+        emb.add_field(name='Пример :', value='/plugin -r')
+        await ctx.send(embed=emb)
 
-    @commands.command()
-    async def buycase(self, ctx):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        cent = 100000  # Цена кейса
-        val = 1  # Кол-во покупаемых кейсов.
-        if balance < cent:
-            he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Ошибка.', value="Недостаточно средств.", inline=False)
-            await ctx.send(embed=he1)
-        elif balance >= cent:
-            cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(cent, ctx.author.id))
-            connection.commit()
-            keys = cursor.execute("SELECT keys FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-            cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(val, ctx.author.id))
-            connection.commit()
-            he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '/openkeys'.", inline=False)
-            await ctx.send(embed=he1)
+    elif todo == '-l':
 
-    @commands.command()
-    async def case(self, ctx):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        keys = cursor.execute("SELECT keys FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        embed = discord.Embed(title=f'[CASE]', color=0x42f566)
-        embed.add_field(name='У вас в наличии:', value=f'{keys} кейсов.', inline=False)
-        await ctx.send(embed=embed)
+        for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
 
-    @commands.command()
-    async def opencase(self, ctx):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        val = 1
-        keys = cursor.execute("SELECT keys FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        if keys >= 1:
-            cursor.execute("UPDATE users SET keys = keys - {} WHERE id = {}".format(val, ctx.author.id))
-            connection.commit()
-            rand = random.randint(0, 100)
-            if rand >= 0 and rand <= 70:
-                he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Вы успено открыли кейс.', value="К сожалению вам ничего не выпало.", inline=False)
-                await ctx.send(embed=he1)
-            if rand >= 71 and rand <= 80:
-                pp1 = 400000
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp1, ctx.author.id))
-                connection.commit()
-                he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Вы успено открыли кейс.', value="Вам выпало 400.000SH", inline=False)
-                await ctx.send(embed=he1)
-            if rand >= 81 and rand <= 90:
-                pp2 = 800000
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp2, ctx.author.id))
-                connection.commit()
-                he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Вы успено открыли кейс.', value="Вам выпало 800.000SH", inline=False)
-                await ctx.send(embed=he1)
-            if rand >= 91 and rand <= 95:
-                pp3 = 1600000
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp3, ctx.author.id))
-                connection.commit()
-                he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Вы успешно открыли кейс.', value="Вам выпало 1.600.000SH", inline=False)
-                await ctx.send(embed=he1)
-            if rand >= 96 and rand <= 100:
-                pp3 = 5555555
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp3, ctx.author.id))
-                connection.commit()
-                he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Вы успешно открыли кейс.', value="Вам выпало 5.555.555SH", inline=False)
-                await ctx.send(embed=he1)
+            if filename.endswith(".py"):
+                await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
 
-        elif keys < 1:
-            he1 = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Ошибка.', value="У вас нет кейсов.", inline=False)
-            await ctx.send(embed=he1)
+        await ctx.send('Plugins loaded')
 
+    elif todo == '-u':
 
-class CommandsMoney(commands.Cog):
-    def __init__(self):
-        self.bot = bot
+        for filename in os.listdir("./cogs"):
 
-    @commands.command()
-    async def balance(self, ctx):
-        for row in cursor.execute(f"SELECT nickname, money FROM users where id={ctx.author.id}"):
-            embed = discord.Embed(title=f'Аккаунт пользователя {row[0]}', color=0x42f566)
-            embed.add_field(name='Баланс:', value=f'{row[1]} SH', inline=False)
-            await ctx.send(embed=embed)
+            if filename.endswith(".py"):
+                await bot.unload_extension(f"cogs.{filename[:-3]}")
 
-    @commands.command()
-    async def give_money(ctx, mention, money):
-        try:
-            mention = str(mention).replace('!', '')
-            for row in cursor.execute(f'SELECT money FROM users where mention=?', (mention,)):
-                cursor.execute(f'UPDATE users SET money={int(money) + row[0]} where mention=?', (mention,))
-            data_base.commit()
-            for row in cursor.execute(f'SELECT nickname FROM users where mention=?', (mention,)):
-                embed = discord.Embed(title='Пополнение баланса', color=0x42f566)
-                embed.set_author(name='Community Bot')
-                embed.add_field(name='Оповещение', value=f'Баланс пользователя {row[0]} пополнен на {money} SH')
-                await ctx.send(embed=embed)
-        except Exception as E:
-            print(f'give_money command error: {E}')
-            embed = discord.Embed(title='Оповещение', color=0xFF0000)
-            embed.add_field(name='Оповещение', value='Ошибка при выполнение программы.')
-            await ctx.send(embed=embed)
+        await ctx.send('Plugins unloaded')
 
-    @commands.command()
-    async def profile(self, ctx):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        profilenick = cursor.execute("SELECT nickname FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        profilebalance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        embed = discord.Embed(title=f'[Profile]', color=0x42f566)
-        embed.add_field(name='Nickname:', value=f'{profilenick}', inline=False)
-        embed.add_field(name='Balance:', value=f'{profilebalance} SH', inline=False)
-        await ctx.send(embed=embed)
+    elif todo == '-r':
 
+        for filename in os.listdir("./cogs"):
 
-class CommandsVoice(commands.Cog):
-    def __init__(self):
-        self.bot = bot
+            if filename.endswith(".py"):
+                await bot.reload_extension(f"cogs.{filename[:-3]}")
 
-    @commands.command()
-    async def create_voice(self, ctx, channel_name):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
-            0]  # Присваиваем баланс из бд к переменной
-        purchase = 2500
-        number = 0
-        if balance < purchase:
-            he1 = discord.Embed(title="[Payment]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
-            await ctx.send(embed=he1)
-        elif balance >= purchase:
-            cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(purchase, ctx.author.id))
-            connection.commit()
-            guild = ctx.guild
-            channel = await guild.create_voice_channel(channel_name)
-            connected = ctx.author.voice
-            channel = discord.utils.get(ctx.guild.channels, name=channel_name)
-            channelid = channel.id
-            print(channelid)
-            he1 = discord.Embed(title="[VoiceManager]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Голосовой канал создан.',
-                          value="У вас есть 24 часа для того чтобы оплатить голосовой канал, иначе он будет удален.",
-                          inline=False)
-            he1.add_field(name='Управление каналом.', value="/voicemenu", inline=False)
-            he1.add_field(name='Помощь с личным каналом.', value="/voicehelp", inline=False)
-            await ctx.send(embed=he1)
-            pay = 12000  # Сумма которая будет отниматься за недельную оплату
+        await ctx.send('Plugins reloaded')
 
-            def countdown(
-                num_of_secs=86400):  # таймер, количество секунд (num_of_secs), до которого будет отсчитывать таймер (24 часа). (86400)
-                while num_of_secs:  # Переменная num_of_secs будет непрерывно уменьшаться в цикле, пока не достигнет 0 (что переводится в False и завершает цикл без каких-либо дополнительных условий).
-                    m, s = divmod(num_of_secs,
-                                  60)  # Функция divmod принимает два числа и возвращает произведение и остаток от двух чисел.
-                    min_sec_format = '{:02d}:{:02d}'.format(m, s)
-                    time.sleep(1)
-                    num_of_secs -= 1
-                print('Countdown finished.')
-                connection = sqlite3.connect('bot_test.db')
-                cursor = connection.cursor()
-                payment = cursor.execute("SELECT Payment FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
-                    0]  # Присваиваем переменную
-                payment1 = int(payment)
-                if payment1 >= 12000:  # Если в поле Payment есть 12000, войс продляется на 7 дней
-                    cursor.execute("UPDATE users SET Payment = Payment - {} WHERE id = {}".format(pay, ctx.author.id))
+# КЛАССЫ COMMANDSROLE И COMMANDSVOCE НА ПЕРЕРАБОТКЕ! БУДУТ ВСЕ В ФАЙЛЕ rolemanage.py! НЕ ТРОГАТЬ РАДИ ВСЕГО СВЯТОГО!
+# class CommandsVoice(commands.Cog):
+#     def __init__(self):
+#         self.bot = bot
+#
+#     @commands.command()
+#     async def create_voice(self, ctx, channel_name):
+#         connection = sqlite3.connect('bot_test.db')
+#         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+#             0]  # Присваиваем баланс из бд к переменной
+#         purchase = 2500
+#         number = 0
+#
+#         if balance < purchase:
+#
+#             he1 = discord.Embed(title="[Payment]", colour=discord.Colour(0x3e038c))
+#             he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
+#             await ctx.send(embed=he1)
+#
+#         elif balance >= purchase:
+#
+#             cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(purchase, ctx.author.id))
+#             connection.commit()
+#             guild = ctx.guild
+#             channel = await guild.create_voice_channel(channel_name)
+#             connected = ctx.author.voice
+#             channel = discord.utils.get(ctx.guild.channels, name=channel_name)
+#             channelid = channel.id
+#             print(channelid)
+#             he1 = discord.Embed(title="[VoiceManager]", colour=discord.Colour(0x3e038c))
+#             he1.add_field(name='Голосовой канал создан.',
+#                           value="У вас есть 24 часа для того чтобы оплатить голосовой канал, иначе он будет удален.",
+#                           inline=False)
+#             he1.add_field(name='Управление каналом.', value="/voicemenu", inline=False)
+#             he1.add_field(name='Помощь с личным каналом.', value="/voicehelp", inline=False)
+#             await ctx.send(embed=he1)
+#             pay = 12000  # Сумма которая будет отниматься за недельную оплату
+#
+#             def countdown(
+#
+#                     num_of_secs=86400):  # таймер, количество секунд (num_of_secs), до которого будет отсчитывать таймер (24 часа). (86400)
+#
+#                 while num_of_secs:  # Переменная num_of_secs будет непрерывно уменьшаться в цикле, пока не достигнет 0 (что переводится в False и завершает цикл без каких-либо дополнительных условий).
+#
+#                     m, s = divmod(num_of_secs,
+#                                   60)  # Функция divmod принимает два числа и возвращает произведение и остаток от двух чисел.
+#                     min_sec_format = '{:02d}:{:02d}'.format(m, s)
+#                     time.sleep(1)
+#                     num_of_secs -= 1
+#                 print('Countdown finished.')
+#                 payment = cursor.execute("SELECT Payment FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+#                     0]  # Присваиваем переменную
+#                 payment1 = int(payment)
+#
+#                 if payment1 >= 12000:  # Если в поле Payment есть 12000, войс продляется на 7 дней
+#
+#                     cursor.execute("UPDATE users SET Payment = Payment - {} WHERE id = {}".format(pay, ctx.author.id))
+#
+#                     def countdown1(num_of_secs=604800):
+#
+#                         while num_of_secs:
+#
+#                             m, s = divmod(num_of_secs, 60)
+#                             min_sec_format = '{:02d}:{:02d}'.format(m, s)
+#                             time.sleep(1)
+#                             num_of_secs -= 1
+#                         print('Countdown finished.')
+#
+#                     countdown1()
+#
+#             countdown()
+#
+#     @commands.command()
+#     async def voicemenu(self, ctx):
+#         he1 = discord.Embed(title="Команды упавления личным голосовым чатом.", colour=discord.Colour(0x3e038c))
+#         he1.add_field(name='/lock', value="Закрывает доступ к комнате.", inline=False)
+#         he1.add_field(name='/open', value="Открывает доступ к комнате.", inline=False)
+#         await ctx.send(embed=he1)
+#
+#     @commands.command(pass_context=True)
+#     @commands.has_permissions(manage_channels=True)
+#     async def lock(self, ctx):
+#         await ctx.channel.purge(limit=1)
+#         channel = ctx.message.author.voice.channel
+#         overwrite = channel.overwrites_for(ctx.guild.default_role)
+#         overwrite.connect = False
+#         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+#
+#     @commands.command(pass_context=True)
+#     @commands.has_permissions(manage_channels=True)
+#     async def open(self, ctx):
+#         await ctx.channel.purge(limit=1)
+#         channel = ctx.message.author.voice.channel
+#         overwrite = channel.overwrites_for(ctx.guild.default_role)
+#         overwrite.connect = True
+#         await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
+#
+#     @commands.command
+#     async def payment(self, ctx, Oplata):
+#         connection = sqlite3.connect('bot_test.db')
+#         aoplata = int(Oplata)
+#         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+#         if balance >= aoplata:
+#
+#             cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(aoplata, ctx.author.id))
+#             cursor.execute("UPDATE users SET Payment = Payment + {} WHERE id = {}".format(aoplata, ctx.author.id))
+#             connection.commit()
+#             embed = discord.Embed(
+#                 title="Оплата прошла успешно.",
+#             )
+#             await ctx.send(embed=embed)
+#         elif balance < aoplata:
+#
+#             he1 = discord.Embed(title="[Payment]", colour=discord.Colour(0x3e038c))
+#             he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
+#             await ctx.send(embed=he1)
+#
+#
+# class CommandsRoles(commands.Cog):
+#     def __init__(self):
+#         self.bot = bot
+#
+#     @commands.command()  # создание роли
+#     async def newrole(self, ctx, *, content):
+#         connection = sqlite3.connect('bot_test.db')
+#         a = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+#         oplata = 10000
+#         op = a
+#         connection.commit()
+#
+#         if op < 10000:
+#
+#             he1 = discord.Embed(title="[BuyRole]", colour=discord.Colour(0x3e038c))
+#             he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
+#             await ctx.send(embed=he1)
+#
+#         elif op >= 10000:
+#
+#             cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(oplata, ctx.author.id))
+#             guild = ctx.guild
+#             role = await guild.create_role(name=content)
+#             roleid = role.id
+#             await ctx.author.add_roles(role)
+#             description = f'''
+#             **Name:** <@{roleid}>
+#             **Created by:** {ctx.author.mention}
+#             '''
+#             await ctx.send("Роль была создана и выдана. Для редакции обратитесь к @St1zy3 ")
+#             print(roleid)
+#
+#     @commands.command()
+#     async def shop(self, ctx):
+#         he1 = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
+#         he1.add_field(name='Магазин ролей.', value="Ниже представлены роли для покупки.", inline=False)
+#         he1.add_field(name='1. [1]', value="35.000 SH", inline=False)
+#         he1.add_field(name='2. [2]', value="50.000 SH", inline=False)
+#         he1.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
+#         await ctx.send(embed=he1)
+#
+#     @commands.command()  # Не работает выдача ролиы
+#     async def buyrole(self, ctx, count: int = None):
+#         member = ctx.message.author
+#         role = discord.Role.name == '[1]'
+#         oplata = 35000
+#         role: discord.Role
+#         member: discord.Member
+#         connection = sqlite3.connect('bot_test.db')
+#         cursor = connection.cursor()
+#         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+#         connection.commit()
+#         if count == 1:
+#             if balance >= 35000:
+#                 roles = 1050283874938261544
+#                 role = int(roles)
+#                 await member.add_roles(roles)
+#                 cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(oplata, ctx.author.id))
+#                 he1 = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
+#                 he1.add_field(name='Спасибо за покупку!', value="Роль была выдана.", inline=False)
+#                 await ctx.send(embed=he1)
+#             else:
+#                 he1 = discord.Embed(title="[Buy]", colour=discord.Colour(0x3e038c))
+#                 he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
+#                 await ctx.send(embed=he1)
 
-                    def countdown1(num_of_secs=604800):
-                        while num_of_secs:
-                            m, s = divmod(num_of_secs, 60)
-                            min_sec_format = '{:02d}:{:02d}'.format(m, s)
-                            time.sleep(1)
-                            num_of_secs -= 1
-                        print('Countdown finished.')
-
-                    countdown1()
-
-            countdown()
-
-    @commands.command()
-    async def voicemenu(self, ctx):
-        he1 = discord.Embed(title="Команды упавления личным голосовым чатом.", colour=discord.Colour(0x3e038c))
-        he1.add_field(name='/lock', value="Закрывает доступ к комнате.", inline=False)
-        he1.add_field(name='/open', value="Открывает доступ к комнате.", inline=False)
-        await ctx.send(embed=he1)
-
-    @commands.command(pass_context=True)
-    @commands.has_permissions(manage_channels=True)
-    async def lock(self, ctx):
-        await ctx.channel.purge(limit=1)
-        channel = ctx.message.author.voice.channel
-        overwrite = channel.overwrites_for(ctx.guild.default_role)
-        overwrite.connect = False
-        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-
-    @commands.command(pass_context=True)
-    @commands.has_permissions(manage_channels=True)
-    async def open(self, ctx):
-        await ctx.channel.purge(limit=1)
-        channel = ctx.message.author.voice.channel
-        overwrite = channel.overwrites_for(ctx.guild.default_role)
-        overwrite.connect = True
-        await channel.set_permissions(ctx.guild.default_role, overwrite=overwrite)
-
-    @commands.command
-    async def payment(ctx, Oplata):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        aoplata = int(Oplata)
-        balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        if balance >= aoplata:
-            cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(aoplata, ctx.author.id))
-            cursor.execute("UPDATE users SET Payment = Payment + {} WHERE id = {}".format(aoplata, ctx.author.id))
-            connection.commit()
-            embed = discord.Embed(
-                title="Оплата прошла успешно.",
-            )
-            await ctx.send(embed=embed)
-        elif balance < aoplata:
-            he1 = discord.Embed(title="[Payment]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
-            await ctx.send(embed=he1)
-
-
-class CommandsRoles(commands.Cog):
-    def __init__(self):
-        self.bot = bot
-
-    @commands.command()  # создание роли
-    async def newrole(ctx, *, content):
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        a = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        oplata = 10000
-        op = a
-        connection.commit()
-        if op < 10000:
-            he1 = discord.Embed(title="[BuyRole]", colour=discord.Colour(0x3e038c))
-            he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
-            await ctx.send(embed=he1)
-        elif op >= 10000:
-            cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(oplata, ctx.author.id))
-            guild = ctx.guild
-            role = await guild.create_role(name=content)
-            roleid = role.id
-            await ctx.author.add_roles(role)
-            description = f'''
-            **Name:** <@{roleid}>
-            **Created by:** {ctx.author.mention}
-            '''
-            await ctx.send("Роль была создана и выдана. Для редакции обратитесь к @St1zy3 ")
-            print(roleid)
-
-    @commands.command()
-    async def shop(self, ctx):
-        he1 = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
-        he1.add_field(name='Магазин ролей.', value="Ниже представлены роли для покупки.", inline=False)
-        he1.add_field(name='1. [1]', value="35.000 SH", inline=False)
-        he1.add_field(name='2. [2]', value="50.000 SH", inline=False)
-        he1.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
-        await ctx.send(embed=he1)
-
-    @commands.command()  # Не работает выдача ролиы
-    async def buyrole(self, ctx, count: int = None):
-        member = ctx.message.author
-        role = discord.Role.name == '[1]'
-        oplata = 35000
-        role: discord.Role
-        member: discord.Member
-        connection = sqlite3.connect('bot_test.db')
-        cursor = connection.cursor()
-        balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        connection.commit()
-        if count == 1:
-            if balance >= 35000:
-                roles = 1050283874938261544
-                role = int(roles)
-                await member.add_roles(roles)
-                cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(oplata, ctx.author.id))
-                he1 = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Спасибо за покупку!', value="Роль была выдана.", inline=False)
-                await ctx.send(embed=he1)
-            else:
-                he1 = discord.Embed(title="[Buy]", colour=discord.Colour(0x3e038c))
-                he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
-                await ctx.send(embed=he1)
+    #
+    #---------------ФРАГМЕНТ КОДА ДЛЯ БУДУЩЕЙ РЕАЛИЗАЦИИ!!!----------------------------------
+    # @bot.command(name="kick", pass_context=True)
+    # @has_permissions(manage_roles=True, ban_members=True)
+    # async def _kick(ctx, member: discord.Member):
+    #     await bot.kick(member)
+    #
+    # @_kick.error
+    # async def kick_error(ctx, error):
+    #     if isinstance(error, MissingPermissions):
+    #         text = "Sorry {}, you do not have permissions to do that!".format(ctx.message.author)
+    #         await bot.send_message(ctx.message.channel, text)
+    #
+    #
+    #
 
 
 bot.run(settings['token'])

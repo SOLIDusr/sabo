@@ -1,9 +1,8 @@
 import discord
-
 from discord.ext import commands
 
-intents = discord.Intents.all()
 
+intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='/', intents=intents)
 
 
@@ -17,7 +16,9 @@ class Info(commands.Cog):
 
         states = ['валюта', "деньги", "вал", "казик", "казино", "казин", "роль", "роли", "войс", "комната", "голос",
                   "кейсы", "кейс", "контейнеры", "команды"]
+
         # Если ошибка при вводе команды /help [something]
+
         if state is not None and state not in states:
 
             emb = discord.Embed(title='[ERROR] help', description=f'{ctx.author.mention}, Укажите правильный раздел',
@@ -25,14 +26,18 @@ class Info(commands.Cog):
             emb.add_field(name='Разделы:', value='команды, валюта, казино, роли, войс, кейсы', inline=False)
             emb.add_field(name='Пример :', value='/help кейсы')
             await ctx.send(embed=emb)
+
         # если не назначено
+
         elif state is None:
 
             emb = discord.Embed(title="О функциях бота", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Напишет', value='Главный тех менеджер - Дима, который лучше меня знает. :leaves:')
             emb.add_field(name='/help команды', value='Информация по командам сервера. :leaves:')
             await ctx.send(embed=emb)
+
         # команды
+
         elif state == "команды":
 
             emb = discord.Embed(title="О активностях и командах сервера", description='Помощь по командам бота',
@@ -45,7 +50,9 @@ class Info(commands.Cog):
             emb.add_field(name='/help войс', value="Узнать о покупке личного голосового канала.:leaves:", inline=False)
             emb.add_field(name='/help кейсы', value="Узнать о покупке кейсов.:leaves:", inline=False)
             await ctx.send(embed=emb)
+
         # валюта
+
         elif state in ['валюта', "деньги", "вал"]:
 
             emb = discord.Embed(title="Информация о валюте", colour=discord.Colour(0x3e038c))
@@ -62,10 +69,12 @@ class Info(commands.Cog):
             emb.add_field(name='Второй вариант.', value="Покупка различных ролей а так же создание кастомной "
                                                         "роли.:leaves:", inline=False)
             await ctx.send(embed=emb)
+
         # казино
+
         elif state in ["казик", "казино", "казин"]:
 
-            emb = discord.Embed(title="CasinoHelp", colour=discord.Colour(0x3e038c))
+            emb = discord.Embed(title="Игры, казино", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Игры Casino:', value="--->", inline=False)
             emb.add_field(name='Первая игра.',
                           value='/casino ставка.''В данной игре при победе вы получаете x2 от ставки, в случае '
@@ -79,8 +88,11 @@ class Info(commands.Cog):
                           inline=False)
             emb.add_field(name='Откуда брать валюту для игры в Казино?:leaves:', value="/Valhelp", inline=False)
             await ctx.send(embed=emb)
+
         # Роли
+
         elif state in ["роль", "роли"]:
+
             emb = discord.Embed(title="Система покупки ролей", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Кастомные роли.', value="На нашем сервере есть возможность создать свою роль.",
                           inline=False)
@@ -100,7 +112,9 @@ class Info(commands.Cog):
                                 'самым будет выделять вас.',
                           inline=False)
             await ctx.send(embed=emb)
+
         # Войсы
+
         elif state in ["войс", "комната", "голос"]:
 
             he1 = discord.Embed(title="Приватные голосовые каналы", colour=discord.Colour(0x3e038c))
@@ -123,17 +137,20 @@ class Info(commands.Cog):
             he1.add_field(name='Могу ли я зарабатывать SH пока нахожусь в своей комнате?', value='Да, можете.',
                           inline=False)
             await ctx.send(embed=he1)
+
         # Кейсы
+
         elif state in ["кейсы", "кейс", "контейнеры"]:
 
-            emb = discord.Embed(title="CaseHelp", colour=discord.Colour(0x3e038c))
+            emb = discord.Embed(title="Помощб по кейсам", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Кейсы.', value="На нашем сервере есть возможность покупать кейсы.", inline=False)
-            emb.add_field(name='Как купить кейс?', value='Покупка кейса происходит командой "/buycase".', inline=False)
+            emb.add_field(name='Как купить кейс?', value='Покупка кейса происходит командой "/case купить".',
+                          inline=False)
             emb.add_field(name='Какая стоимость кейса?', value="Стоимость одного кейса составляет 100.000 SH.",
                           inline=False)
             emb.add_field(name='Как узнать сколько у меня кейсов?', value="Это можно сделать командой '/case'.",
                           inline=False)
-            emb.add_field(name='Как открыть кейс?', value='Открыть кейс можно при помощи команды "/opencase".',
+            emb.add_field(name='Как открыть кейс?', value='Открыть кейс можно при помощи команды "/case открыть.',
                           inline=False)
             await ctx.send(embed=emb)
 
