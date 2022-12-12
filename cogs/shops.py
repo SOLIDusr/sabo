@@ -1,9 +1,9 @@
 import discord
 import sqlite3
 from discord.ext import commands
-from config import *
+from configs.config import *
 from discord.ui import Button, View
-from config_dicts import *
+from configs.config_dicts import *
 
 intents = discord.Intents.all()
 
@@ -71,7 +71,7 @@ class Shop(commands.Cog):
             emb = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Магазин ролей.', value="Ниже представлены роли для покупки.", inline=False)
             for item in shop.keys():
-                emb.add_field(name=f'Роль - {item}. Стоимость: {shop[item]}')
+                emb.add_field(name=f'Роль - {item}', value=f'Стоимость: {shop[item]}')
             emb.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
             await ctx.send(embed=emb)
 
@@ -110,6 +110,7 @@ class Shop(commands.Cog):
         view = View()
         view.add_item(custom_role_b)
         view.add_item(room_b)
+        view.add_item(roles_b)
         await ctx.send(embed=emb, view=view)
 
         # @commands.command()  # создание роли
