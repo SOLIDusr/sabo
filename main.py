@@ -52,7 +52,12 @@ async def on_ready():
 
 @bot.event  # Узнает время в войсе
 async def on_voice_state_update(member, before, after):
+    payment = cursor.execute("SELECT Payment FROM users WHERE id = {}".format(member.id)).fetchone()[0]   
+    foxpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(member.id)).fetchone()[0]
+    payment1 = int(payment)
     payment2 = int(payment1)
+    voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
+    
 
     if payment2 < 12000:  # Если денег на Payment нет , - войс
 
@@ -84,13 +89,29 @@ async def on_voice_state_update(member, before, after):
             pass
 
         elif vtime > 1:
+            if foxpets == 1:
+                vtimer = vtime * 10  # Начисление за проведенный промежуток времени
+                foxeffect = 7 * (1/100) * vtimer
+                roundup = math.ceil(foxeffect)
+                result = vtimer + roundup
+                for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
+                    cursor.execute(f'UPDATE users SET money={result + row[0]} where id={member.id}')
+                cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE id = {}".format(vtime, member.id)) #Закидывает в бд минуты проведенные в войсе
+                data_base.commit()
 
-            vtimer = vtime * 10  # Начисление за проведенный промежуток времени
+            else:
+                vtimer = vtime * 10  # Начисление за проведенный промежуток времени
 
-            for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
-                cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
+                for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
+                    cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
+                cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE id = {}".format(vtime, member.id)) #Закидывает в бд минуты проведенные в войсе
+                data_base.commit()
 
-            data_base.commit()
+    if voicetime >= 1440:
+        giftcase = 1
+        resetvoice = 1440
+        cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(giftcase, member.id)) # Каждые 24 часа которые накапают за то что ты сидел в войсе , будет выдаваться кейс
+        cursor.execute("UPDATE users SET voicetime = voicetime - {} WHERE id = {}".format(resetvoice, member.id)) # По новой все делаем
 
 
 @bot.command()

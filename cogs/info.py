@@ -15,7 +15,7 @@ class Info(commands.Cog):
     async def help(self, ctx, state: str = None):
 
         states = ['валюта', "деньги", "вал", "казик", "казино", "казин", "роль", "роли", "войс", "комната", "голос",
-                  "кейсы", "кейс", "контейнеры", "команды"]
+                  "кейсы", "кейс", "контейнеры", "команды","питомцы","питомец"]
 
         # Если ошибка при вводе команды /help [something]
 
@@ -33,6 +33,7 @@ class Info(commands.Cog):
 
             emb = discord.Embed(title="О функциях бота", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Напишет', value='Главный тех менеджер - Дима, который лучше меня знает. :leaves:')
+            emb.add_field(name='(От Димы)', value='Я ничего не знаю, помогите.')
             emb.add_field(name='/help команды', value='Информация по командам сервера. :leaves:')
             await ctx.send(embed=emb)
 
@@ -49,6 +50,7 @@ class Info(commands.Cog):
             emb.add_field(name='/help роли', value="Узнать о покупке кастомной роли.:leaves:", inline=False)
             emb.add_field(name='/help войс', value="Узнать о покупке личного голосового канала.:leaves:", inline=False)
             emb.add_field(name='/help кейсы', value="Узнать о покупке кейсов.:leaves:", inline=False)
+            emb.add_field(name='/help питомцы', value="Узнать о кейсах с питомцами и о самих питомцах.:leaves:", inline=False)
             await ctx.send(embed=emb)
 
         # валюта
@@ -142,16 +144,49 @@ class Info(commands.Cog):
 
         elif state in ["кейсы", "кейс", "контейнеры"]:
 
-            emb = discord.Embed(title="Помощб по кейсам", colour=discord.Colour(0x3e038c))
+            emb = discord.Embed(title="Помощь по кейсам", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Кейсы.', value="На нашем сервере есть возможность покупать кейсы.", inline=False)
             emb.add_field(name='Как купить кейс?', value='Покупка кейса происходит командой "/case купить".',
                           inline=False)
-            emb.add_field(name='Какая стоимость кейса?', value="Стоимость одного кейса составляет 100.000 SH.",
+            emb.add_field(name='Какая стоимость кейса?', value="Стоимость одного кейса составляет 10.000 SH.",
                           inline=False)
             emb.add_field(name='Как узнать сколько у меня кейсов?', value="Это можно сделать командой '/case'.",
                           inline=False)
             emb.add_field(name='Как открыть кейс?', value='Открыть кейс можно при помощи команды "/case открыть.',
                           inline=False)
+            await ctx.send(embed=emb)
+
+        # Питомцы
+
+        elif state in ["питомцы", "питомец"]:
+
+            emb = discord.Embed(title="Помощь по питомцам", colour=discord.Colour(0x3e038c))
+            emb.add_field(name='Питомцы.', value="На нашем сервере есть возможность покупать кейсы с питомцами.", inline=False)
+            emb.add_field(name='Как купить кейс?', value='Покупка кейса происходит командой "/casepets купить".',
+                          inline=False)
+            emb.add_field(name='Какая стоимость данного кейса?', value="Стоимость одного кейса составляет 5.000 SH.",
+                          inline=False)
+            emb.add_field(name='Как узнать сколько у меня кейсов с питомцами?', value="Это можно сделать командой '/casepets'.",
+                          inline=False)
+            emb.add_field(name='Как открыть кейс с питомцами?', value='Открыть кейс можно при помощи команды "/casepets открыть.',
+                          inline=False)
+            emb.add_field(name='Какой шанс выбить питомца из кейса?', value='Очень маленький :)',
+                          inline=False)
+            emb.add_field(name='Для чего нужны питомцы?', value='Питомцы дают различные положительные эффекты.',
+                          inline=False)
+            emb.add_field(name='Каких питомцев можно выбить в данный момент?', value='Сейчас расскажу.',
+                          inline=False)
+            emb.add_field(name='1."Волк"', value='Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%.',
+                          inline=False)
+            emb.add_field(name='Пример:', value='Вы сыграли в казино на 50.000 SH, победили, вам прибавляется на баланс 50.000 SH которые вы выйграли и сверху 3.500 SH за счет того что у вас данный питомец.',
+                          inline=False)
+            emb.add_field(name='2."Лиса"', value='Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.',
+                          inline=False)
+            emb.add_field(name='Пример:', value='Вы просидели в голосовом канале 4 часа, после выхода вам начислятся 4.800 SH, за счет того что у вас данный питомец , вам сверху прибавится 336 SH.',
+                          inline=False)
+            emb.add_field(name='Как узнать какие у меня есть питомцы?', value='/mypets',
+                          inline=False)
+
             await ctx.send(embed=emb)
 
 
