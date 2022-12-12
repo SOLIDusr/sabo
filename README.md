@@ -3,4 +3,4 @@
 
 ## Sabo
 
-SOLID Discord bot for Moderating lobbys, voice chats and making users activity more "valuable"
+Solid Discord bot for Moderating lobbys, voice chats and making users activity more "valuable". Open-sourse project from 2 developers. Just practice, but some code fragments could be usefull :>
