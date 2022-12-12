@@ -28,6 +28,8 @@ async def on_ready():
     print(f'My client id is {bot.user.id}')
     print('Bot Connected')
     global tdict
+    # await bot.add_cog(CommandsVoice())
+    # await bot.add_cog(CommandsRoles())
     tdict = {}
     await bot.change_presence(activity=discord.Game('/help'))
     for guild in bot.guilds:
@@ -141,7 +143,7 @@ async def plugin(ctx, todo: str = None):
 
         await ctx.send('Plugins reloaded')
 
-# КЛАССЫ COMMANDSROLE И COMMANDSVOCE НА ПЕРЕРАБОТКЕ! БУДУТ ВСЕ В ФАЙЛЕ rolemanage.py! НЕ ТРОГАТЬ РАДИ ВСЕГО СВЯТОГО!
+
 # class CommandsVoice(commands.Cog):
 #     def __init__(self):
 #         self.bot = bot
@@ -300,7 +302,7 @@ async def plugin(ctx, todo: str = None):
 #         he1.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
 #         await ctx.send(embed=he1)
 #
-#     @commands.command()  # Не работает выдача ролиы
+#     @commands.command()  # Не работает выдача роли
 #     async def buyrole(self, ctx, count: int = None):
 #         member = ctx.message.author
 #         role = discord.Role.name == '[1]'
@@ -308,7 +310,6 @@ async def plugin(ctx, todo: str = None):
 #         role: discord.Role
 #         member: discord.Member
 #         connection = sqlite3.connect('bot_test.db')
-#         cursor = connection.cursor()
 #         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
 #         connection.commit()
 #         if count == 1:
