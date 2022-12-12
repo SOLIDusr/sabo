@@ -479,31 +479,30 @@ class Gambling(commands.Cog):
     async def mypets(self, ctx):
         wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
         foxpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        dogpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-#        if wolfpets == 1 and foxpets == 0 :
-#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-#            emb.add_field(name='Ваши питомцы.', value="На данный момент у вас из питомцев только 'Волк', если была Лиса, ее съели.", inline=False)
-#            emb.add_field(name='Эффект от питомца.',
-#                          value="Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%.", inline=False)
-#            await ctx.send(embed=emb)
-#        elif foxpets == 1 and wolfpets == 0:
-#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-#            emb.add_field(name='Ваши питомцы.', value="У вас есть только питомец 'Лиса'.", inline=False)
-#            emb.add_field(name='Эффект от питомца.',
-#                          value="Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
-#                          inline=False)
-#            await ctx.send(embed=emb)
-#        elif foxpets == 1 and wolfpets == 1:
-#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-#            emb.add_field(name='Ваши питомцы.', value="У вас есть 2 питомца, 'Волк' и 'Лиса'.", inline=False)
-#            emb.add_field(name='Эффекты от питомцев.',
-#                          value="'Волк' - Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%. 'Лиса' - Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
-#                          inline=False)
-#            await ctx.send(embed=emb)
-#        elif foxpets == 0 and wolfpets == 0:
-#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-#            emb.add_field(name='Ваши питомцы.', value="У вас нет питомцев :(", inline=False)
-#            await ctx.send(embed=emb)
+        if wolfpets == 1 and foxpets == 0:
+            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+            emb.add_field(name='Ваши питомцы.', value="У вас есть только питомец 'Волк'.", inline=False)
+            emb.add_field(name='Эффект от питомца.',
+                          value="Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%.", inline=False)
+            await ctx.send(embed=emb)
+        elif foxpets == 1 and wolfpets == 0:
+            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+            emb.add_field(name='Ваши питомцы.', value="У вас есть только питомец 'Лиса'.", inline=False)
+            emb.add_field(name='Эффект от питомца.',
+                          value="Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
+                          inline=False)
+            await ctx.send(embed=emb)
+        elif foxpets == 1 and wolfpets == 1:
+            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+            emb.add_field(name='Ваши питомцы.', value="У вас есть 2 питомца, 'Волк' и 'Лиса'.", inline=False)
+            emb.add_field(name='Эффекты от питомцев.',
+                          value="'Волк' - Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%. 'Лиса' - Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
+                          inline=False)
+            await ctx.send(embed=emb)
+        elif foxpets == 0 and wolfpets == 0:
+            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+            emb.add_field(name='Ваши питомцы.', value="У вас нет питомцев :(", inline=False)
+            await ctx.send(embed=emb)
 
 
 async def setup(bot):
