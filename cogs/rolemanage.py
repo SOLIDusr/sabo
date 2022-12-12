@@ -2,6 +2,7 @@ import discord
 import sqlite3
 from discord.ext import commands
 from config import *
+from discord.ui import Button, View
 import time
 import math
 import os
@@ -19,19 +20,33 @@ global channelid
 global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма
 global vtime
 
-class Roles(commands.Cog):
+
+class Shop(commands.Cog):
 
     def __init__(self):
         self.bot = bot
 
-    @commands.command(aliases=['магазин', 'магаз'])
-    async def shop(self, ctx):
-        pass
-        # ----------------------------------------------------------------------
-        # Я БУДУ ПЕРЕДЕЛЫВАТЬ ВСЁ В ПОКУПКЕ
-        # РОЛЕЙ, МАГАЗИНЕ И ПРОЧЕМ! ВОЗМОЖНО ОБЪЕДИНЮ ПОКУПКУ ВОЙСА С ЭТИМ ДОПОЛНЕНИЕМ! ТУТ ЛУЧШЕ ОСТАВИТЬ ВСЁ
-        # МЕРТВЫМ. КЛАСС КЛАССЫ COMMANDSROLE И COMMANDSVOCE НА ПЕРЕРАБОТКЕ! БУДУТ ВСЕ В ФАЙЛЕ rolemanage.py! НЕ
-        # ТРОГАТЬ РАДИ ВСЕГО СВЯТОГО! ----------------------------------------------------------------------
+    # КНОПОЧКИ!!
+    # @commands.command(aliases=['магазин', 'магаз'])
+    # async def shop(self, ctx):
+    #     emb = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
+    #     emb.add_field(name='Магазин сервера.', value="Ниже представлены категории покупки.", inline=False)
+    #     roles_button = Button(label='Роли', style=discord.ButtonStyle.primary, emoji='<:booster:1029482318118797412>')
+    #     room_button = Button(label='Комната', style=discord.ButtonStyle.primary, emoji='🔊')
+    #
+    #     async def role_callback(interaction):
+    #         await ctx.send('понял-понял')
+    #         await interaction.response.is_done()
+    #     async def room_callback(interaction):
+    #         await interaction.response.send_message("WASSUP")
+    #
+    #     roles_button.callback = role_callback
+    #     room_button.callback = room_callback
+    #     view = View()
+    #     view.add_item(roles_button)
+    #     view.add_item(room_button)
+    #     await ctx.send(embed=emb, view=view)
+    #
 
 
 
@@ -45,9 +60,9 @@ class Roles(commands.Cog):
         #
         #     if op < 10000:
         #
-        #         he1 = discord.Embed(title="[BuyRole]", colour=discord.Colour(0x3e038c))
-        #         he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
-        #         await ctx.send(embed=he1)
+        #         emb = discord.Embed(title="[BuyRole]", colour=discord.Colour(0x3e038c))
+        #         emb.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
+        #         await ctx.send(embed=emb)
         #
         #     elif op >= 10000:
         #
@@ -65,12 +80,12 @@ class Roles(commands.Cog):
         #
         # @commands.command()
         # async def shop(self, ctx):
-        #     he1 = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
-        #     he1.add_field(name='Магазин ролей.', value="Ниже представлены роли для покупки.", inline=False)
-        #     he1.add_field(name='1. [1]', value="35.000 SH", inline=False)
-        #     he1.add_field(name='2. [2]', value="50.000 SH", inline=False)
-        #     he1.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
-        #     await ctx.send(embed=he1)
+        #     emb = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
+        #     emb.add_field(name='Магазин ролей.', value="Ниже представлены роли для покупки.", inline=False)
+        #     emb.add_field(name='1. [1]', value="35.000 SH", inline=False)
+        #     emb.add_field(name='2. [2]', value="50.000 SH", inline=False)
+        #     emb.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
+        #     await ctx.send(embed=emb)
         #
         # @commands.command()  # Не работает выдача ролиы
         # async def buyrole(self, ctx, count: int = None):
@@ -89,15 +104,16 @@ class Roles(commands.Cog):
         #             role = int(roles)
         #             await member.add_roles(roles)
         #             cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(oplata, ctx.author.id))
-        #             he1 = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
-        #             he1.add_field(name='Спасибо за покупку!', value="Роль была выдана.", inline=False)
-        #             await ctx.send(embed=he1)
+        #             emb = discord.Embed(title="[SHOP]", colour=discord.Colour(0x3e038c))
+        #             emb.add_field(name='Спасибо за покупку!', value="Роль была выдана.", inline=False)
+        #             await ctx.send(embed=emb)
         #         else:
-        #             he1 = discord.Embed(title="[Buy]", colour=discord.Colour(0x3e038c))
-        #             he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
-        #             await ctx.send(embed=he1)
+        #             emb = discord.Embed(title="[Buy]", colour=discord.Colour(0x3e038c))
+        #             emb.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
+        #             await ctx.send(embed=emb)
         #
 
+
 async def setup(bot):
-    await bot.add_cog(Roles())
+    await bot.add_cog(Shop())
 

@@ -141,7 +141,6 @@ async def plugin(ctx, todo: str = None):
 
         await ctx.send('Plugins reloaded')
 
-# КЛАССЫ COMMANDSROLE И COMMANDSVOCE НА ПЕРЕРАБОТКЕ! БУДУТ ВСЕ В ФАЙЛЕ rolemanage.py! НЕ ТРОГАТЬ РАДИ ВСЕГО СВЯТОГО!
 # class CommandsVoice(commands.Cog):
 #     def __init__(self):
 #         self.bot = bot
