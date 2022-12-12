@@ -1,21 +1,18 @@
 import discord
 import sqlite3
 from discord.ext import commands
-from config import *
+from configs.config import *
 import random
 import math
 
-
 data_base = sqlite3.connect('bot_test.db', timeout=10)
 cursor = data_base.cursor()
-
 
 # the goad to get rid of globals
 global payment1
 global channelid
 # global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма (Not used(strange))
 global vtime
-
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
@@ -56,24 +53,44 @@ class Gambling(commands.Cog):
         else:
 
             if number < 50:
-
-                cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
-                await ctx.send(embed=embed)
+                dogpets = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                    0]
+                if dogpets == 1:
+                    if amount <= 100:
+                        cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
+                        connection.commit()
+                        embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
+                        embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
+                        await ctx.send(embed=embed)
+                    else:
+                        dogeffect = 5 * (1/100) * amount
+                        roundup = math.ceil(dogeffect)
+                        cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
+                        cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(roundup, ctx.author.id))
+                        connection.commit()
+                        embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
+                        embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
+                        embed.add_field(name='За счет того что у вас есть питомец собака, вам вернули', value=f'{roundup} SH', inline=False)
+                        await ctx.send(embed=embed)
+                else:  
+                    cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
+                    connection.commit()
+                    embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
+                    embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
+                    await ctx.send(embed=embed)
 
             elif number == 93:
-
-                cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(result, ctx.author.id))
-                connection.commit()
+                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                    0]
                 if wolfpets == 1:
-                    wolfeffect = 7 * (1/100) * jackpot
-                    roundup = math.ceil(wolfeffect) #Округление
+                    wolfeffect = 7 * (1 / 100) * jackpot
+                    roundup = math.ceil(wolfeffect)  # Округление
                     result = jackpot + roundup
+                    cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(result, ctx.author.id))
                     embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                     embed.add_field(name='О боже мой!!! Вы выйграли JACKPOT, мы добавили вам на баланс:',
-                                    value=f'{jackpot} SH + Бонус: {roundup} SH за счет того что у вас есть питомец "Волк".', inline=False)
+                                    value=f'{jackpot} SH + Бонус: {roundup} SH за счет того что у вас есть питомец "Волк".',
+                                    inline=False)
                     await ctx.send(embed=embed)
 
                 else:
@@ -97,16 +114,19 @@ class Gambling(commands.Cog):
                 await ctx.send(embed=emb)
 
             else:
-                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                    0]
                 if wolfpets == 1:
-                    
-                    wolfeffect = 7 * (1/100) * amount
+
+                    wolfeffect = 7 * (1 / 100) * amount
                     roundup = math.ceil(wolfeffect)
                     result = amount + roundup
                     cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(result, ctx.author.id))
                     connection.commit()
                     embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                    embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount} SH + Бонус: {roundup} SH за счет того что у вас есть питомец "Волк".', inline=False)
+                    embed.add_field(name='Поздравляю! Вы выйграли:',
+                                    value=f'{amount} SH + Бонус: {roundup} SH за счет того что у вас есть питомец "Волк".',
+                                    inline=False)
                     await ctx.send(embed=embed)
 
                 else:
@@ -145,30 +165,57 @@ class Gambling(commands.Cog):
         else:
 
             if count != number:
+                dogpets = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                    0]
+                if dogpets == 1:
+                    if amount <= 100:
+                        cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
+                        connection.commit()
+                        embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
+                        embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
+                        embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
+                        await ctx.send(embed=embed)
 
-                cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
-                embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
-                embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
-                await ctx.send(embed=embed)
+                    else:
+                        dogeffect = 5 * (1/100) * amount
+                        roundup = math.ceil(dogeffect)
+                        cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
+                        cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(roundup, ctx.author.id))
+                        connection.commit()
+                        embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
+                        embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
+                        embed.add_field(name='За счет того что у вас есть питомец "Собака", вам вернули:', value=f'{roundup} SH', inline=False)
+                        embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
+                        await ctx.send(embed=embed)
+                
+                else:
+                    cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
+                    connection.commit()
+                    embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
+                    embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
+                    embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
+                    await ctx.send(embed=embed)
 
             elif count == number:
-                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                    0]
                 # Если есть волк
                 if wolfpets == 1:
                     win = amount * 36
-                    wolfeffect = 7 * (1/100) * win
+                    wolfeffect = 7 * (1 / 100) * win
                     roundup = math.ceil(wolfeffect)
                     result = win + roundup
                     cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(result, ctx.author.id))
                     connection.commit()
                     embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
-                    embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount * 36} SH + Бонус: {roundup} SH за счет того что у вас есть питомец "Волк".', inline=False)
+                    embed.add_field(name='Поздравляю! Вы выйграли:',
+                                    value=f'{amount * 36} SH + Бонус: {roundup} SH за счет того что у вас есть питомец "Волк".',
+                                    inline=False)
                     embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
                     await ctx.send(embed=embed)
                 else:
-                    cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(amount*36, ctx.author.id))
+                    cursor.execute(
+                        "UPDATE users SET money = money + {} WHERE id = {}".format(amount * 36, ctx.author.id))
                     connection.commit()
                     embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                     embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount * 36} SH.', inline=False)
@@ -275,24 +322,25 @@ class Gambling(commands.Cog):
                 cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(val, ctx.author.id))
                 connection.commit()
                 emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                emb.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '/case открыть или /case open'.", inline=False)
+                emb.add_field(name='Успешно.',
+                              value="Кейс был куплен, для открытия введите '/case открыть или /case open'.",
+                              inline=False)
                 await ctx.send(embed=emb)
 
-##############  ЗАДУМКА ##############
-# Из кейсов с питомцами , с очень маленьким шансом могут упасть питомцы , которые будут давать какие либо положительные эффекты.
-# Пример N1. После победы в казино , если есть определенный питомец будет сверху прибавлятся пару процентов от выйгрыша.
-# Пример N2. После выхода из войса будут бонусные SH за время проведенное в войсе. 
-# Это пока что пару примеров которые попробую реализовать , далее с приходом идеи о новом питомце можно будет добавлять новых.
-
-
+    ##############  ЗАДУМКА ##############
+    # Из кейсов с питомцами , с очень маленьким шансом могут упасть питомцы , которые будут давать какие либо положительные эффекты.
+    # Пример N1. После победы в казино , если есть определенный питомец будет сверху прибавлятся пару процентов от выйгрыша.
+    # Пример N2. После выхода из войса будут бонусные SH за время проведенное в войсе.
+    # Это пока что пару примеров которые попробую реализовать , далее с приходом идеи о новом питомце можно будет добавлять новых.
 
     # casepets открыть не работает, хз почему
-    @commands.command(aliases=["питомцы", "кейс с питомцами", "питомец кейс"]) # Кейсы с питомцами
+    @commands.command(aliases=["питомцы", "кейс с питомцами", "питомец кейс"])  # Кейсы с питомцами
     async def casepets(self, ctx, move: str = None):
 
         moves = ["открыть", "купить", "buy", "open"]
         wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
         foxpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+        dogpets = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
         casepets = cursor.execute("SELECT casepets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
         connection = data_base
@@ -305,12 +353,13 @@ class Gambling(commands.Cog):
 
         elif move is not None and move not in moves:
 
-            emb = discord.Embed(title='[ERROR] CasePets', description=f'{ctx.author.mention}, Укажите правильное действие!',
+            emb = discord.Embed(title='[ERROR] CasePets',
+                                description=f'{ctx.author.mention}, Укажите правильное действие!',
                                 colour=discord.Colour(0xe73c3c))
             emb.add_field(name='Действия:', value=f'{moves}', inline=False)
             emb.add_field(name='Пример :', value='/casepets открыть')
             await ctx.send(embed=emb)
-        
+
         elif move in ['окрыть', 'open']:
 
             casepets = cursor.execute("SELECT casepets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
@@ -320,22 +369,27 @@ class Gambling(commands.Cog):
             if casepets >= 1:
                 cursor.execute("UPDATE users SET casepets = casepets - {} WHERE id = {}".format(val, ctx.author.id))
                 connection.commit()
-                rand = random.randint(0,50)
+                rand = random.randint(0, 50)
 
                 if rand == 31:
 
                     if wolfpets == 1:
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='[Итог]', value="Вам бы выпал питомец 'Волк', но он у вас уже есть.",
-                                    inline=False)
+                                      inline=False)
                         await ctx.send(embed=emb)
 
                     else:
-                        cursor.execute("UPDATE users SET wolfpets = wolfpets + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute(
+                            "UPDATE users SET wolfpets = wolfpets + {} WHERE id = {}".format(val, ctx.author.id))
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='Поздравляем.', value="Вам выпал питомец 'Волк'.", inline=False)
-                        emb.add_field(name='Питомец "Волк".', value="Данный питомец прибавляет процент от суммы выйгрыша в казино на 7% .", inline=False)
-                        emb.add_field(name='Пример:".', value="Вы сыграли в казино на 50.000 SH, победили, вам прибавляется на баланс 50.000 SH которые вы выйграли и сверху 3.500 SH за счет того что у вас данный питомец .", inline=False)
+                        emb.add_field(name='Питомец "Волк".',
+                                      value="Данный питомец прибавляет процент от суммы выйгрыша в казино на 7% .",
+                                      inline=False)
+                        emb.add_field(name='Пример:".',
+                                      value="Вы сыграли в казино на 50.000 SH, победили, вам прибавляется на баланс 50.000 SH которые вы выйграли и сверху 3.500 SH за счет того что у вас данный питомец .",
+                                      inline=False)
                         emb.add_field(name='Посмотреть ваших питомцев:', value="/mypets", inline=False)
                         emb.add_field(name='Узнать информацию о всех питомцах', value="/help питомцы", inline=False)
                         await ctx.send(embed=emb)
@@ -344,32 +398,60 @@ class Gambling(commands.Cog):
                     if foxpets == 1:
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='[Итог]', value="Вам бы выпал питомец 'Лиса', но он у вас уже есть.",
-                                    inline=False)
+                                      inline=False)
                         await ctx.send(embed=emb)
 
                     else:
-                        cursor.execute("UPDATE users SET foxpets = foxpets + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute(
+                            "UPDATE users SET foxpets = foxpets + {} WHERE id = {}".format(val, ctx.author.id))
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='Поздравляем.', value="Вам выпал питомец 'Лиса'.", inline=False)
-                        emb.add_field(name='Питомец "Лиса".', value="Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.", inline=False)
-                        emb.add_field(name='Пример:".', value="Вы просидели в голосовом канале 4 часа, после выхода вас начислятся 4.800 SH, за счет того что у вас данный питомец , вам сверху прибавится 336 SH.", inline=False)
+                        emb.add_field(name='Питомец "Лиса".',
+                                      value="Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
+                                      inline=False)
+                        emb.add_field(name='Пример:".',
+                                      value="Вы просидели в голосовом канале 4 часа, после выхода вас начислятся 4.800 SH, за счет того что у вас данный питомец , вам сверху прибавится 336 SH.",
+                                      inline=False)
                         emb.add_field(name='Посмотреть ваших питомцев:', value="/mypets", inline=False)
                         emb.add_field(name='Узнать информацию о всех питомцах', value="/help питомцы", inline=False)
                         await ctx.send(embed=emb)
 
+                elif rand == 37:
+                    if dogpets == 1:
+                        emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
+                        emb.add_field(name='[Итог]', value="Вам бы выпал питомец 'Собака', но он у вас уже есть.",
+                                      inline=False)
+                        await ctx.send(embed=emb)
+
+                    else:
+                        cursor.execute(
+                            "UPDATE users SET dogpets = dogpets + {} WHERE id = {}".format(val, ctx.author.id))
+                        emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
+                        emb.add_field(name='Поздравляем.', value="Вам выпал питомец 'Собака'.", inline=False)
+                        emb.add_field(name='Питомец "Собака".',
+                                      value="Данный питомец возвращает вам 5 % от проигрыша в казино.",
+                                      inline=False)
+                        emb.add_field(name='Пример:".',
+                                      value="Вы поставили в казино 5000 SH и проиграли , за счет того что у вас данный питомец, вам вернется 250 SH. :exclamation: Если ставка менее 100 SH возврата средств не будет :exclamation: ",
+                                      inline=False)
+                        emb.add_field(name='Посмотреть ваших питомцев:', value="/mypets", inline=False)
+                        emb.add_field(name='Узнать информацию о всех питомцах', value="/help питомцы", inline=False)
+                        await ctx.send(embed=emb)
+
+
+
+
                 else:
                     emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='[Итог]', value="К сожалению вам ничего не выпало.",
-                                inline=False)
+                                  inline=False)
                     await ctx.send(embed=emb)
-
 
             elif casepets <= 0:
 
                 emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                 emb.add_field(name='Ошибка.', value="У вас нет кейсов.", inline=False)
                 await ctx.send(embed=emb)
-
 
         elif move in ['buy', 'купить']:
 
@@ -387,7 +469,9 @@ class Gambling(commands.Cog):
                 cursor.execute("UPDATE users SET casepets = casepets + {} WHERE id = {}".format(val, ctx.author.id))
                 connection.commit()
                 emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
-                emb.add_field(name='Успешно.', value="Кейс с питомцами был куплен, для открытия введите '/casepets открыть или /casepets open'.", inline=False)
+                emb.add_field(name='Успешно.',
+                              value="Кейс с питомцами был куплен, для открытия введите '/casepets открыть или /casepets open'.",
+                              inline=False)
                 await ctx.send(embed=emb)
 
     # Андрей пожалуйста переделай это , я сделал это очень криво, голова не варит , нет идей как грамотно это оформить.
@@ -395,25 +479,32 @@ class Gambling(commands.Cog):
     async def mypets(self, ctx):
         wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
         foxpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-        if wolfpets == 1 and foxpets == 0:
-            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-            emb.add_field(name='Ваши питомцы.', value="У вас есть только питомец 'Волк'.", inline=False)
-            emb.add_field(name='Эффект от питомца.', value="Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%.", inline=False)
-            await ctx.send(embed=emb)
-        elif foxpets == 1 and wolfpets == 0:
-            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-            emb.add_field(name='Ваши питомцы.', value="У вас есть только питомец 'Лиса'.", inline=False)
-            emb.add_field(name='Эффект от питомца.', value="Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.", inline=False)
-            await ctx.send(embed=emb)
-        elif foxpets == 1 and wolfpets == 1:
-            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-            emb.add_field(name='Ваши питомцы.', value="У вас есть 2 питомца, 'Волк' и 'Лиса'.", inline=False)
-            emb.add_field(name='Эффекты от питомцев.', value="'Волк' - Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%. 'Лиса' - Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.", inline=False)
-            await ctx.send(embed=emb)
-        elif foxpets == 0 and wolfpets == 0:
-            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
-            emb.add_field(name='Ваши питомцы.', value="У вас нет питомцев :(", inline=False)
-            await ctx.send(embed=emb)
+        dogpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+#        if wolfpets == 1 and foxpets == 0 :
+#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+#            emb.add_field(name='Ваши питомцы.', value="На данный момент у вас из питомцев только 'Волк', если была Лиса, ее съели.", inline=False)
+#            emb.add_field(name='Эффект от питомца.',
+#                          value="Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%.", inline=False)
+#            await ctx.send(embed=emb)
+#        elif foxpets == 1 and wolfpets == 0:
+#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+#            emb.add_field(name='Ваши питомцы.', value="У вас есть только питомец 'Лиса'.", inline=False)
+#            emb.add_field(name='Эффект от питомца.',
+#                          value="Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
+#                          inline=False)
+#            await ctx.send(embed=emb)
+#        elif foxpets == 1 and wolfpets == 1:
+#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+#            emb.add_field(name='Ваши питомцы.', value="У вас есть 2 питомца, 'Волк' и 'Лиса'.", inline=False)
+#            emb.add_field(name='Эффекты от питомцев.',
+#                          value="'Волк' - Данный питомец прибавляет процент от суммы выйгрыша в казино на 7%. 'Лиса' - Данный питомец прибавляет 7% SH от времени которое вы находились в голосовом канале.",
+#                          inline=False)
+#            await ctx.send(embed=emb)
+#        elif foxpets == 0 and wolfpets == 0:
+#            emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
+#            emb.add_field(name='Ваши питомцы.', value="У вас нет питомцев :(", inline=False)
+#            await ctx.send(embed=emb)
+
 
 async def setup(bot):
     await bot.add_cog(Gambling())

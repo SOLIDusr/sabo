@@ -1,7 +1,7 @@
 import discord
 import sqlite3
 from discord.ext import commands
-from config import *
+from configs.config import *
 from discord.ext.commands import has_permissions, MissingPermissions
 
 
