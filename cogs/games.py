@@ -1,5 +1,6 @@
 import discord
 import sqlite3
+from discord.ui import Select, View
 from discord.ext import commands
 from configs.config import *
 import random
@@ -53,9 +54,9 @@ class Gambling(commands.Cog):
         else:
 
             if number < 50:
-                dogpets = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                dogavtive = cursor.execute("SELECT dogactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
                     0]
-                if dogpets == 1:
+                if dogavtive == 1:
                     if amount <= 100:
                         cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
                         connection.commit()
@@ -80,9 +81,9 @@ class Gambling(commands.Cog):
                     await ctx.send(embed=embed)
 
             elif number == 93:
-                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                wolfactive = cursor.execute("SELECT wlofactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
                     0]
-                if wolfpets == 1:
+                if wolfactive == 1:
                     wolfeffect = 7 * (1 / 100) * jackpot
                     roundup = math.ceil(wolfeffect)  # Округление
                     result = jackpot + roundup
@@ -114,9 +115,9 @@ class Gambling(commands.Cog):
                 await ctx.send(embed=emb)
 
             else:
-                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                wolfactive = cursor.execute("SELECT wolfactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
                     0]
-                if wolfpets == 1:
+                if wolfactive == 1:
 
                     wolfeffect = 7 * (1 / 100) * amount
                     roundup = math.ceil(wolfeffect)
@@ -165,9 +166,9 @@ class Gambling(commands.Cog):
         else:
 
             if count != number:
-                dogpets = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                dogactive = cursor.execute("SELECT dogactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
                     0]
-                if dogpets == 1:
+                if dogactive == 1:
                     if amount <= 100:
                         cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
                         connection.commit()
@@ -197,10 +198,10 @@ class Gambling(commands.Cog):
                     await ctx.send(embed=embed)
 
             elif count == number:
-                wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
+                wolfactive = cursor.execute("SELECT wolfactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[
                     0]
                 # Если есть волк
-                if wolfpets == 1:
+                if wolfactive == 1:
                     win = amount * 36
                     wolfeffect = 7 * (1 / 100) * win
                     roundup = math.ceil(wolfeffect)
@@ -474,7 +475,6 @@ class Gambling(commands.Cog):
                               inline=False)
                 await ctx.send(embed=emb)
 
-    # Андрей пожалуйста переделай это , я сделал это очень криво, голова не варит , нет идей как грамотно это оформить.
     @commands.command(aliases=["мои питомцы", "мои петы"])
     async def mypets(self, ctx):
         wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
@@ -503,6 +503,125 @@ class Gambling(commands.Cog):
             emb = discord.Embed(title="[MyPets]", colour=discord.Colour(0x3e038c))
             emb.add_field(name='Ваши питомцы.', value="У вас нет питомцев :(", inline=False)
             await ctx.send(embed=emb)
+
+    @commands.command()  # Выбрать питомца
+    async def selectpet(self, ctx, move: str = None):
+        select = Select(
+
+            options=[
+            discord.SelectOption(
+                label="Wolf", 
+                emoji="🐺"
+            ),
+
+            discord.SelectOption(
+                label="Fox", 
+                emoji="🦊"
+            ),
+
+            discord.SelectOption(
+                label="Dog", 
+                emoji="🐶"
+            )
+        ])
+
+        async def my_callback(interaction): # Если namepet active - выбран данный питомец
+            val = 1
+            wolfpet = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+            foxpet = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+            dogpet = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+            wolfactive = cursor.execute("SELECT wolfactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+            foxactive = cursor.execute("SELECT foxactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+            dogactive = cursor.execute("SELECT dogactive FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
+            connection = data_base
+            if select.values[0] == "Wolf":
+                if wolfpet == 0:
+                    await ctx.send("У вас нет данного питомца.")
+                else:
+                    if wolfactive == 1:
+                        await ctx.send("У вас установлен данный питомец.")
+                    elif wolfactive == 0 and foxactive == 0 and dogactive == 0:
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif wolfactive == 0 and foxactive >= 1 and dogactive >= 1:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET foxactive = foxactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        
+                        connection.commit()
+                    elif wolfactive == 0 and foxactive >= 1 and dogactive == 0:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET foxactive = foxactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        
+                        connection.commit()
+                    elif wolfactive == 0 and foxactive == 0 and dogactive >= 1:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        
+                        connection.commit()
+
+            elif select.values[0] == "Fox":
+                if foxpet == 0:
+                    await ctx.send("У вас нет данного питомца.")
+                else:
+                    if foxactive == 1:
+                        await ctx.send("У вас установлен данный питомец.")
+                    elif wolfactive == 0 and foxactive == 0 and dogactive == 0:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET foxactive = foxactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif wolfactive >= 1 and foxactive == 0 and dogactive >= 1:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET foxactive = foxactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif wolfactive >= 0 and foxactive == 0 and dogactive == 0:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET foxactive = foxactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif wolfactive >= 0 and foxactive == 0 and dogactive >= 1:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET foxactive = foxactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        
+                        connection.commit()
+
+            elif select.values[0] == "Dog":
+                if dogpet == 0:
+                    await ctx.send("У вас нет данного питомца.")
+                else:
+                    if dogactive == 1:
+                        await ctx.send("У вас установлен данный питомец.")
+                    elif wolfactive == 0 and foxactive == 0 and dogactive == 0:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET dogactive = dogactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif wolfactive == 1 and foxactive == 1 and dogactive == 0:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET foxactive = foxactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif dogactive == 0 and wolfactive >= 1 and foxactive == 0:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET wolfactive = wolfactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+                    elif dogactive == 0 and wolfactive == 0 and foxactive >= 1:
+                        await interaction.response.send_message(f"Выбран питомец: {select.values[0]}")
+                        cursor.execute("UPDATE users SET foxactive = foxactive - {} WHERE id = {}".format(val, ctx.author.id))
+                        cursor.execute("UPDATE users SET dogactive = dogactive + {} WHERE id = {}".format(val, ctx.author.id))
+                        connection.commit()
+
+        select.callback = my_callback
+        view = View()
+        view.add_item(select)
+        await ctx.send("Select Pet",view=view)
 
 
 async def setup(bot):

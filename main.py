@@ -53,7 +53,7 @@ async def on_ready():
 @bot.event  # Узнает время в войсе
 async def on_voice_state_update(member, before, after):
     payment = cursor.execute("SELECT Payment FROM users WHERE id = {}".format(member.id)).fetchone()[0]   
-    foxpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(member.id)).fetchone()[0]
+    foxactive = cursor.execute("SELECT foxactive FROM users WHERE id = {}".format(member.id)).fetchone()[0]
     payment1 = int(payment)
     payment2 = int(payment1)
     voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
@@ -89,7 +89,7 @@ async def on_voice_state_update(member, before, after):
             pass
 
         elif vtime > 1:
-            if foxpets == 1:
+            if foxactive == 1:
                 vtimer = vtime * 10  # Начисление за проведенный промежуток времени
                 foxeffect = 7 * (1/100) * vtimer
                 roundup = math.ceil(foxeffect)

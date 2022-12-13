@@ -190,6 +190,8 @@ class Info(commands.Cog):
                           inline=False)
             emb.add_field(name='Как узнать какие у меня есть питомцы?', value='/mypets (В разработке)',
                           inline=False)
+            emb.add_field(name=':exclamation: Важно :exclamation:', value='Если у вас несколько питомцев , выбран может быть только один , выбрать питомца можно командой "/selectpet".',
+                          inline=False)
 
             await ctx.send(embed=emb)
 
