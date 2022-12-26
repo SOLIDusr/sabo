@@ -1,11 +1,7 @@
 # importing libs
 import discord
-<<<<<<< Updated upstream
-import sqlite3
 from discord.ext import commands
 from configs.config import *
-=======
->>>>>>> Stashed changes
 import time
 import math
 from discord.ext import commands
@@ -193,7 +189,6 @@ async def plugin(ctx, todo: str = None):
 
         await ctx.send('Plugins reloaded')
 
-<<<<<<< Updated upstream
 # class CommandsVoice(commands.Cog):
 #     def __init__(self):
 #         self.bot = bot
@@ -393,7 +388,4 @@ async def plugin(ctx, todo: str = None):
     #
     #
 
-
-=======
->>>>>>> Stashed changes
 bot.run(settings['token'])
