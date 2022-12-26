@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../sabo-old/.idea/discord_economy_bot_guide.iml" filepath="$PROJECT_DIR$/../sabo-old/.idea/discord_economy_bot_guide.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/sabo.iml" filepath="$PROJECT_DIR$/.idea/sabo.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../sabo-update/.idea/sabo-update.iml" filepath="$PROJECT_DIR$/../sabo-update/.idea/sabo-update.iml" />
     </modules>
   </component>
 </project>

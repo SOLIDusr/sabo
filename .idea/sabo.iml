@@ -4,6 +4,6 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="sabo-update" />
+    <orderEntry type="module" module-name="discord_economy_bot_guide" />
   </component>
 </module>

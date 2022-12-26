@@ -1,18 +1,10 @@
-# importing libs
 import discord
-<<<<<<< Updated upstream
-import sqlite3
 from discord.ext import commands
 from configs.config import *
-=======
->>>>>>> Stashed changes
-import time
-import math
-from discord.ext import commands
 import os
+# import math
+# import time
 import psycopg2 as sql
-# importing configs
-from configs.config import settings
 from configs.database_config import *
 
 
@@ -22,8 +14,9 @@ bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_comm
 
 global payment1
 global channelid
-global oplata
+global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма
 global vtime
+
 
 data_base = sql.connect(
         host=host,
@@ -44,18 +37,21 @@ except Exception as _ex:
 
     print(f'Error happend while connecting to Database! {Exception}')
 
-# on ready
+# bot.event
 
 
 @bot.event
 async def on_ready():
-    print(f"Bot launched!\nBot's name is {bot.user.name}\nId is {bot.user.id}\nConnected!")
+    print('Bot launched successfully :)')
+    print(f'My name is {bot.user.name}')
+    print(f'My client id is {bot.user.id}')
+    print('Bot Connected')
     global tdict
     tdict = {}
     await bot.change_presence(activity=discord.Game('/help'))
     for guild in bot.guilds:
 
-        print(f'Connected to: {guild.id}')
+        print(f'Connected to server, id is: {guild.id}')
 
         for member in guild.members:
 
@@ -63,13 +59,16 @@ async def on_ready():
 
             if cursor.fetchone() is None:
 
-                print('Fetching database')
+                print('do')
                 cursor.execute(
-                    f"INSERT INTO users (id, nickname, mention, money) VALUES ({member.id}, {member.name},"
-                    f" <@{member.id}, 0)"
-                )
-                print('Got one')
+                    f"INSERT INTO users (id, nickname, mention, money) VALUES ({member.id}, '{member.name}', '<@{member.id}>', 0)")
+                data_base.commit()
+                print('done')
+
             else:
+
+                print('Nothing to do (59)')
+
                 pass
 
     for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
@@ -77,69 +76,71 @@ async def on_ready():
             await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
 
 
-@bot.event  # Узнает время в войсе
-async def on_voice_state_update(member, before, after):
-    payment = cursor.execute("SELECT Payment FROM users WHERE id = {}".format(member.id)).fetchone()[0]   
-    foxactive = cursor.execute("SELECT foxactive FROM users WHERE id = {}".format(member.id)).fetchone()[0]
-    payment1 = int(payment)
-    payment2 = int(payment1)
-    voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
-    
-
-    if payment2 < 12000:  # Если денег на Payment нет , - войс
-
-        cchanelid = channelid
-        channel = bot.get_channel(cchanelid)
-        await channel.delete()
-
-    else:
-
-        pass
-
-    author = member.id
-
-    if before.channel is None and after.channel is not None:
-
-        t1 = time.time()
-        tdict[author] = t1
-
-    elif before.channel is not None and after.channel is None and author in tdict:
-
-        t2 = time.time()
-        t3 = t2 - tdict[author]
-        tround = math.ceil(t3)
-        vtim = tround / 60
-        vtime = math.ceil(vtim)
-
-        if vtime <= 1:  # Проверка на время в войсе (Менее одной минуты или нет)
-
-            pass
-
-        elif vtime > 1:
-            if foxactive == 1:
-                vtimer = vtime * 10  # Начисление за проведенный промежуток времени
-                foxeffect = 7 * (1/100) * vtimer
-                roundup = math.ceil(foxeffect)
-                result = vtimer + roundup
-                for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
-                    cursor.execute(f'UPDATE users SET money={result + row[0]} where id={member.id}')
-                cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE id = {}".format(vtime, member.id)) #Закидывает в бд минуты проведенные в войсе
-                data_base.commit()
-
-            else:
-                vtimer = vtime * 10  # Начисление за проведенный промежуток времени
-
-                for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
-                    cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
-                cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE id = {}".format(vtime, member.id)) #Закидывает в бд минуты проведенные в войсе
-                data_base.commit()
-
-    if voicetime >= 1440:
-        giftcase = 1
-        resetvoice = 1440
-        cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(giftcase, member.id)) # Каждые 24 часа которые накапают за то что ты сидел в войсе , будет выдаваться кейс
-        cursor.execute("UPDATE users SET voicetime = voicetime - {} WHERE id = {}".format(resetvoice, member.id)) # По новой все делаем
-
+# @bot.event  # Узнает время в войсе
+# async def on_voice_state_update(member, before, after):
+#     payment = cursor.execute('SELECT payment FROM users WHERE id = {}'.format(member.id)).fetchone()[0]
+#     # foxactive = cursor.execute("SELECT foxactive FROM users WHERE id = {}".format(member.id)).fetchone()[0]
+#     payment1 = int(payment)
+#     payment2 = int(payment1)
+#     voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
+#
+#     if payment2 < 12000:  # Если денег на Payment нет , - войс
+#
+#         cchanelid = channelid
+#         channel = bot.get_channel(cchanelid)
+#         await channel.delete()
+#
+#     else:
+#
+#         pass
+#
+#     author = member.id
+#
+#     if before.channel is None and after.channel is not None:
+#
+#         t1 = time.time()
+#         tdict[author] = t1
+#
+#     elif before.channel is not None and after.channel is None and author in tdict:
+#
+#         t2 = time.time()
+#         t3 = t2 - tdict[author]
+#         tround = math.ceil(t3)
+#         vtim = tround / 60
+#         vtime = math.ceil(vtim)
+#
+#         if vtime <= 1:  # Проверка на время в войсе (Менее одной минуты или нет)
+#
+#             pass
+#
+#         elif vtime > 1:
+#             if foxactive == 1:
+#                 vtimer = vtime * 10  # Начисление за проведенный промежуток времени
+#                 foxeffect = 7 * (1 / 100) * vtimer
+#                 roundup = math.ceil(foxeffect)
+#                 result = vtimer + roundup
+#                 for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
+#                     cursor.execute(f'UPDATE users SET money={result + row[0]} where id={member.id}')
+#                 cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE id = {}".format(vtime,
+#                                                                                                   member.id))  # Закидывает в бд минуты проведенные в войсе
+#                 data_base.commit()
+#
+#             else:
+#                 vtimer = vtime * 10  # Начисление за проведенный промежуток времени
+#
+#                 for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
+#                     cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
+#                 cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE users.id = {}".format(vtime,
+#                                                                                                   member.id))  # Закидывает в бд минуты проведенные в войсе
+#                 data_base.commit()
+#
+#     if voicetime >= 1440:
+#         giftcase = 1
+#         resetvoice = 1440
+#         cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(giftcase,
+#                                                                                 member.id))  # Каждые 24 часа которые накапают за то что ты сидел в войсе , будет выдаваться кейс
+#         cursor.execute("UPDATE users SET voicetime = voicetime - {} WHERE id = {}".format(resetvoice,
+#                                                                                           member.id))  # По новой все делаем
 
 
 @bot.command()
@@ -193,7 +194,6 @@ async def plugin(ctx, todo: str = None):
 
         await ctx.send('Plugins reloaded')
 
-<<<<<<< Updated upstream
 # class CommandsVoice(commands.Cog):
 #     def __init__(self):
 #         self.bot = bot
@@ -394,6 +394,4 @@ async def plugin(ctx, todo: str = None):
     #
 
 
-=======
->>>>>>> Stashed changes
 bot.run(settings['token'])
