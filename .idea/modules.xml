@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/sabo.iml" filepath="$PROJECT_DIR$/.idea/sabo.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../sabo-update/.idea/sabo-update.iml" filepath="$PROJECT_DIR$/../sabo-update/.idea/sabo-update.iml" />
+    </modules>
+  </component>
+</project>
