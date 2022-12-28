@@ -1,5 +1,0 @@
-host = 'portaler.org'
-port = '5445'
-user = 'postgres'
-password = '161616'
-db_name = 'bot_test'
