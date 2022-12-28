@@ -32,28 +32,20 @@ intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_command=None)
 
 
-
 class Pets(commands.Cog):
 
     def __init__(self):
         self.bot = bot
 
-    # @commands.command(aliases=["питомцы", "кейс с питомцами", "питомец кейс"])
-    # async def casepets(self, ctx):
-    #     moves = ["открыть", "купить", "buy", "open"]
-    #     user_pets = list(cursor.execute(f"SELECT pet_has FROM users WHERE id = {ctx.author.id}").fetchone()[0])
-    #     await ctx.send(f'Хуева кукуева! {user_pets}')
-    #
+    @commands.command(aliases=["питомцы", "кейс с питомцами", "питомец кейс"])
+    async def casepets(self, ctx):
+        moves = ["открыть", "купить", "buy", "open"]
+        user_pets = list(cursor.execute(f"SELECT pet_has FROM users WHERE id = {ctx.author.id}").fetchone()[0])
+        await ctx.send(f'Хуева кукуева! {user_pets}')
+
 
 async def setup(bot):
     await bot.add_cog(Pets())
-
-#         wolfpets = cursor.execute("SELECT wolfpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-#         foxpets = cursor.execute("SELECT foxpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-#         dogpets = cursor.execute("SELECT dogpets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-#         casepets = cursor.execute("SELECT casepets FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-#         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-#         connection = data_base
 #
 #         if move is None:
 #

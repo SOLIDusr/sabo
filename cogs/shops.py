@@ -1,28 +1,36 @@
 import discord
-<<<<<<< Updated upstream
-import sqlite3
-from discord.ext import commands
-from configs.config import *
-from discord.ui import Button, View
 from configs.config_dicts import *
-=======
-from main import data_base, cursor
 from discord.ext import commands
 from configs.config import *
 from discord.ui import Button, View
 from configs.shop_config import *
->>>>>>> Stashed changes
+import psycopg2 as sql
+from configs.database_config import *
+
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_command=None)
 
-<<<<<<< Updated upstream
-data_base = sqlite3.connect('bot_test.db', timeout=10)
+data_base = sql.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=db_name,
+        port=port,
 
-cursor = data_base.cursor()
-=======
->>>>>>> Stashed changes
+    )
+data_base.autocommit = False
+
+try:
+
+    cursor = data_base.cursor()
+
+
+except Exception as _ex:
+
+    print(f'Error happend while connecting to Database! {Exception}')
+
 
 global payment1
 global channelid
@@ -61,16 +69,9 @@ class Shop(commands.Cog):
 
         async def roles():
 
-<<<<<<< Updated upstream
-            connection = sqlite3.connect('bot_test.db')
-            a = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-            op = a
-            connection.commit()
-=======
-            a = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
-            op = a
+            cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))
+            op = cursor.fetchone()[0]
             data_base.commit()
->>>>>>> Stashed changes
 
             if op < 10000:
 

@@ -1,12 +1,9 @@
 import discord
-from discord.ext import commands
 from configs.config import *
-import time
-import math
 from discord.ext import commands
 import os
-# import math
-# import time
+import time
+import math
 import psycopg2 as sql
 from configs.database_config import *
 
@@ -79,71 +76,58 @@ async def on_ready():
             await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
 
 
-# @bot.event  # Узнает время в войсе
-# async def on_voice_state_update(member, before, after):
-#     payment = cursor.execute('SELECT payment FROM users WHERE id = {}'.format(member.id)).fetchone()[0]
-#     # foxactive = cursor.execute("SELECT foxactive FROM users WHERE id = {}".format(member.id)).fetchone()[0]
-#     payment1 = int(payment)
-#     payment2 = int(payment1)
-#     voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
-#
-#     if payment2 < 12000:  # Если денег на Payment нет , - войс
-#
-#         cchanelid = channelid
-#         channel = bot.get_channel(cchanelid)
-#         await channel.delete()
-#
-#     else:
-#
-#         pass
-#
-#     author = member.id
-#
-#     if before.channel is None and after.channel is not None:
-#
-#         t1 = time.time()
-#         tdict[author] = t1
-#
-#     elif before.channel is not None and after.channel is None and author in tdict:
-#
-#         t2 = time.time()
-#         t3 = t2 - tdict[author]
-#         tround = math.ceil(t3)
-#         vtim = tround / 60
-#         vtime = math.ceil(vtim)
-#
-#         if vtime <= 1:  # Проверка на время в войсе (Менее одной минуты или нет)
-#
-#             pass
-#
-#         elif vtime > 1:
-#             if foxactive == 1:
-#                 vtimer = vtime * 10  # Начисление за проведенный промежуток времени
-#                 foxeffect = 7 * (1 / 100) * vtimer
-#                 roundup = math.ceil(foxeffect)
-#                 result = vtimer + roundup
-#                 for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
-#                     cursor.execute(f'UPDATE users SET money={result + row[0]} where id={member.id}')
-#                 cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE id = {}".format(vtime,
-#                                                                                                   member.id))  # Закидывает в бд минуты проведенные в войсе
-#                 data_base.commit()
-#
-#             else:
-#                 vtimer = vtime * 10  # Начисление за проведенный промежуток времени
-#
-#                 for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
-#                     cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
-#                 cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE users.id = {}".format(vtime,
-#                                                                                                   member.id))  # Закидывает в бд минуты проведенные в войсе
-#                 data_base.commit()
-#
-#     if voicetime >= 1440:
-#         giftcase = 1
-#         resetvoice = 1440
-#         cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(giftcase,
-#                                                                                 member.id))  # Каждые 24 часа которые накапают за то что ты сидел в войсе , будет выдаваться кейс
-#         cursor.execute("UPDATE users SET voicetime = voicetime - {} WHERE id = {}".format(resetvoice,
-#                                                                                           member.id))  # По новой все делаем
+@bot.event  # Узнает время в войсе
+async def on_voice_state_update(member, before, after):
+    payment = cursor.execute('SELECT payment FROM users WHERE id = {}'.format(member.id)).fetchone()[0]
+    payment1 = int(payment)
+    payment2 = int(payment1)
+    voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
+
+    if payment2 < 12000:  # Если денег на Payment нет , - войс
+
+        cchanelid = channelid
+        channel = bot.get_channel(cchanelid)
+        await channel.delete()
+
+    else:
+
+        pass
+
+    author = member.id
+
+    if before.channel is None and after.channel is not None:
+
+        t1 = time.time()
+        tdict[author] = t1
+
+    elif before.channel is not None and after.channel is None and author in tdict:
+
+        t2 = time.time()
+        t3 = t2 - tdict[author]
+        tround = math.ceil(t3)
+        vtim = tround / 60
+        vtime = math.ceil(vtim)
+
+        if vtime <= 1:  # Проверка на время в войсе (Менее одной минуты или нет)
+
+            pass
+
+        elif vtime > 1:
+            vtimer = vtime * 10  # Начисление за проведенный промежуток времени
+
+            for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
+                cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
+            cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE users.id = {}".format(vtime,
+                                                                                                  member.id))  # Закидывает в бд минуты проведенные в войсе
+            data_base.commit()
+
+    if voicetime >= 1440:
+        giftcase = 1
+        resetvoice = 1440
+        cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(giftcase,
+                                                                                member.id))  # Каждые 24 часа которые накапают за то что ты сидел в войсе , будет выдаваться кейс
+        cursor.execute("UPDATE users SET voicetime = voicetime - {} WHERE id = {}".format(resetvoice,
+                                                                                          member.id))  # По новой все делаем
 
 
 @bot.command()

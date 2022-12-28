@@ -25,7 +25,7 @@ class Economics(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['bal', 'баланс', 'бал'])
-    async def balance(self, ctx, member:discord.Member=None):
+    async def balance(self, ctx, member: discord.Member = None):
 
         if member is not None:
 
@@ -54,7 +54,7 @@ class Economics(commands.Cog):
 
     @bot.command(name="set_money", pass_context=True)
     @has_permissions(manage_roles=True, ban_members=True)
-    async def set_money(self, ctx, member: discord.Member, amount:int = None):
+    async def set_money(self, ctx, member: discord.Member, amount: int = None):
 
         if amount < 0:
 
@@ -94,6 +94,7 @@ class Economics(commands.Cog):
         embed.add_field(name='Nickname:', value=f'{profile_nick}', inline=False)
         embed.add_field(name='Balance:', value=f'{profile_balance} SH', inline=False)
         await ctx.send(embed=embed)
+
 
 async def setup(bot):
     await bot.add_cog(Economics())

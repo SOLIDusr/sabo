@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from config import *
+from configs.config import *
 import random
 
 
@@ -23,7 +23,7 @@ try:
 
 except Exception as _ex:
 
-    print(f'Error happend while connecting to Database! {Exception}')
+    print(f'Error happend while connecting to Database! {_ex}')
 
 # the goad to get rid of globals
 global payment1
@@ -47,7 +47,7 @@ class Gambling(commands.Cog):
         balance = cursor.fetchone()[0]
         connection = data_base
         number = random.randint(1, 100)
-        jackpot = random.randint(5000, 20000)
+        jackpot = random.randint(5000, 500_000)
 
         # Условия и т.д
 
@@ -261,7 +261,8 @@ class Gambling(commands.Cog):
                 cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(val, ctx.author.id))
                 connection.commit()
                 emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                emb.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '/case открыть или /case open'.", inline=False)
+                emb.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '/case открыть или "
+                                                     "/case open'.", inline=False)
                 await ctx.send(embed=emb)
 
 
