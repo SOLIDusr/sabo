@@ -2,10 +2,20 @@ import discord
 from discord.ext import commands
 from configs.config import *
 import random
-
-
 import psycopg2 as sql
 from configs.database_config import *
+
+
+intents = discord.Intents.all()
+
+bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_command=None)
+
+
+global payment1
+global channelid
+global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма
+global vtime
+
 data_base = sql.connect(
         host=host,
         user=user,
@@ -25,16 +35,6 @@ except Exception as _ex:
 
     print(f'Error happend while connecting to Database! {_ex}')
 
-# the goad to get rid of globals
-global payment1
-global channelid
-# global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма (Not used(strange))
-global vtime
-
-
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=settings['prefix'], intents=intents)
-
 
 class Gambling(commands.Cog):
 
@@ -45,9 +45,8 @@ class Gambling(commands.Cog):
     async def __casino(self, ctx, amount: int = None):
         cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))
         balance = cursor.fetchone()[0]
-        connection = data_base
         number = random.randint(1, 100)
-        jackpot = random.randint(5000, 500_000)
+        jackpot = random.randint(5000, 20000)
 
         # Условия и т.д
 
@@ -74,7 +73,7 @@ class Gambling(commands.Cog):
             if number < 50:
 
                 cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                 embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
                 await ctx.send(embed=embed)
@@ -82,7 +81,7 @@ class Gambling(commands.Cog):
             elif number == 93:
 
                 cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(jackpot, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                 embed.add_field(name='О боже мой!!! Вы выйграли JACKPOT, мы добавили вам на баланс:',
                                 value=f'{jackpot} SH', inline=False)
@@ -105,7 +104,7 @@ class Gambling(commands.Cog):
             else:
 
                 cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                 embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount} SH', inline=False)
                 await ctx.send(embed=embed)
@@ -113,7 +112,6 @@ class Gambling(commands.Cog):
     @commands.command()
     async def roulette(self, ctx, amount: int = None, count: int = None):
 
-        connection = data_base
         number = random.randint(0, 36)
         cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))
         balance = cursor.fetchone()[0]
@@ -143,7 +141,7 @@ class Gambling(commands.Cog):
             if count != number:
 
                 cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(amount, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                 embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
                 embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
@@ -152,7 +150,7 @@ class Gambling(commands.Cog):
             elif count == number:
 
                 cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(amount * 36, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                 embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount * 36} SH', inline=False)
                 embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
@@ -163,11 +161,9 @@ class Gambling(commands.Cog):
 
         moves = ["открыть", "купить", "buy", "open"]
         cursor.execute("SELECT keys FROM users WHERE id = {}".format(ctx.author.id))
+        keys = cursor.fetchone()[0]
         cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))
-        keys = cursor.fetchone()
-        balance = cursor.fetchone()
-
-        connection = data_base
+        balance = cursor.fetchone()[0]
 
         if move is None:
 
@@ -184,16 +180,14 @@ class Gambling(commands.Cog):
             await ctx.send(embed=emb)
 
         elif move in ['окрыть', 'open']:
-
-            cursor.execute("SELECT keys FROM users WHERE id = {}".format(ctx.author.id))
-            keys = cursor.fetchone()
-            connection = data_base
+            keys = cursor.fetchone()[0]
+            cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))
             val = 1
 
             if keys >= 1:
 
                 cursor.execute("UPDATE users SET keys = keys - {} WHERE id = {}".format(val, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 rand = random.randint(0, 100)
 
                 if 0 <= rand <= 70:
@@ -207,7 +201,7 @@ class Gambling(commands.Cog):
 
                     pp1 = 400000
                     cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp1, ctx.author.id))
-                    connection.commit()
+                    data_base.commit()
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успено открыли кейс.', value="Вам выпало 400.000SH", inline=False)
                     await ctx.send(embed=emb)
@@ -216,7 +210,7 @@ class Gambling(commands.Cog):
 
                     pp2 = 800000
                     cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp2, ctx.author.id))
-                    connection.commit()
+                    data_base.commit()
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успено открыли кейс.', value="Вам выпало 800.000SH", inline=False)
                     await ctx.send(embed=emb)
@@ -225,7 +219,7 @@ class Gambling(commands.Cog):
 
                     pp3 = 1600000
                     cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp3, ctx.author.id))
-                    connection.commit()
+                    data_base.commit()
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успешно открыли кейс.', value="Вам выпало 1.600.000SH", inline=False)
                     await ctx.send(embed=emb)
@@ -234,7 +228,7 @@ class Gambling(commands.Cog):
 
                     pp3 = 5555555
                     cursor.execute("UPDATE users SET money = money + {} WHERE id = {}".format(pp3, ctx.author.id))
-                    connection.commit()
+                    data_base.commit()
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успешно открыли кейс.', value="Вам выпало 5.555.555SH", inline=False)
                     await ctx.send(embed=emb)
@@ -259,12 +253,13 @@ class Gambling(commands.Cog):
 
                 cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(cent, ctx.author.id))
                 cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(val, ctx.author.id))
-                connection.commit()
+                data_base.commit()
                 emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
-                emb.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '/case открыть или "
-                                                     "/case open'.", inline=False)
+                emb.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '"
+                                                     "/case открыть или /case open'.", inline=False)
                 await ctx.send(embed=emb)
 
 
+# noinspection PyShadowingNames
 async def setup(bot):
     await bot.add_cog(Gambling())

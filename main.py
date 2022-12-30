@@ -1,22 +1,24 @@
 import discord
-from configs.config import *
 from discord.ext import commands
-import os
+from configs.config import *
 import time
 import math
+import os
+from logs import *
 import psycopg2 as sql
 from configs.database_config import *
+
 
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_command=None)
 
+
 global payment1
 global channelid
 global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма
 global vtime
-
 
 data_base = sql.connect(
         host=host,
@@ -37,21 +39,21 @@ except Exception as _ex:
 
     print(f'Error happend while connecting to Database! {Exception}')
 
+
 # bot.event
-
-
 @bot.event
 async def on_ready():
-    print('Bot launched successfully :)')
-    print(f'My name is {bot.user.name}')
-    print(f'My client id is {bot.user.id}')
-    print('Bot Connected')
+    logger.info("Bot started")
+    logger.info(f"Bot name is {bot.user.name}")
+    logger.info(f'Client id is {bot.user.id}')
     global tdict
+    # await bot.add_cog(CommandsVoice())
+    # await bot.add_cog(CommandsRoles())
     tdict = {}
     await bot.change_presence(activity=discord.Game('/help'))
     for guild in bot.guilds:
 
-        print(f'Connected to server, id is: {guild.id}')
+        logger.info(f'Connected to server, id is: {guild.id}')
 
         for member in guild.members:
 
@@ -59,29 +61,24 @@ async def on_ready():
 
             if cursor.fetchone() is None:
 
-                print('do')
                 cursor.execute(
                     f"INSERT INTO users (id, nickname, mention, money) VALUES ({member.id}, '{member.name}', '<@{member.id}>', 0)")
                 data_base.commit()
-                print('done')
+                logger.info(f'Added user to database')
 
             else:
 
-                print('Nothing to do (59)')
-
                 pass
-
+            logger.info('Database Full')
     for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
         if filename.endswith(".py"):
             await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
+            logger.info(f'Extension {filename} loaded')
 
 
 @bot.event  # Узнает время в войсе
 async def on_voice_state_update(member, before, after):
-    payment = cursor.execute('SELECT payment FROM users WHERE id = {}'.format(member.id)).fetchone()[0]
-    payment1 = int(payment)
     payment2 = int(payment1)
-    voicetime = cursor.execute("SELECT voicetime FROM users WHERE id = {}".format(member.id)).fetchone()[0]
 
     if payment2 < 12000:  # Если денег на Payment нет , - войс
 
@@ -113,26 +110,18 @@ async def on_voice_state_update(member, before, after):
             pass
 
         elif vtime > 1:
+
             vtimer = vtime * 10  # Начисление за проведенный промежуток времени
 
-            for row in cursor.execute(f'SELECT money FROM users where id={member.id}'):
-                cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
-            cursor.execute("UPDATE users SET voicetime = voicetime + {} WHERE users.id = {}".format(vtime,
-                                                                                                  member.id))  # Закидывает в бд минуты проведенные в войсе
-            data_base.commit()
+            cursor.execute(f'SELECT money FROM users where id={member.id}')
+            row = cursor.fetchone()
+            cursor.execute(f'UPDATE users SET money={vtimer + row[0]} where id={member.id}')
 
-    if voicetime >= 1440:
-        giftcase = 1
-        resetvoice = 1440
-        cursor.execute("UPDATE users SET keys = keys + {} WHERE id = {}".format(giftcase,
-                                                                                member.id))  # Каждые 24 часа которые накапают за то что ты сидел в войсе , будет выдаваться кейс
-        cursor.execute("UPDATE users SET voicetime = voicetime - {} WHERE id = {}".format(resetvoice,
-                                                                                          member.id))  # По новой все делаем
+            data_base.commit()
 
 
 @bot.command()
 async def plugin(ctx, todo: str = None):
-
     todos = ['-l', '-r', '-u']
 
     if todo is None:
@@ -140,7 +129,6 @@ async def plugin(ctx, todo: str = None):
         for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
 
             if filename.endswith(".py"):
-
                 await ctx.send(f'Плагин - {filename[:-3]} существует!')
 
         await ctx.send('/plugin -l чтобы загрузить')
@@ -151,7 +139,6 @@ async def plugin(ctx, todo: str = None):
                             colour=discord.Colour(0xe73c3c))
         emb.add_field(name='Действия:', value='-r - restart, -l - load, -u - unload', inline=False)
         emb.add_field(name='Пример :', value='/plugin -r')
-
         await ctx.send(embed=emb)
 
     elif todo == '-l':
@@ -160,7 +147,7 @@ async def plugin(ctx, todo: str = None):
 
             if filename.endswith(".py"):
                 await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
-
+                logger.info('Loaded plugins')
         await ctx.send('Plugins loaded')
 
     elif todo == '-u':
@@ -171,6 +158,7 @@ async def plugin(ctx, todo: str = None):
                 await bot.unload_extension(f"cogs.{filename[:-3]}")
 
         await ctx.send('Plugins unloaded')
+        logger.info('Plugins unloaded')
 
     elif todo == '-r':
 
@@ -178,8 +166,9 @@ async def plugin(ctx, todo: str = None):
 
             if filename.endswith(".py"):
                 await bot.reload_extension(f"cogs.{filename[:-3]}")
-
+        logger.info("plugins reloaded")
         await ctx.send('Plugins reloaded')
+
 
 # class CommandsVoice(commands.Cog):
 #     def __init__(self):
@@ -339,7 +328,7 @@ async def plugin(ctx, todo: str = None):
 #         he1.add_field(name='Покупка.', value="Для покупки необходимо написать '/buyrole Номер роли'", inline=False)
 #         await ctx.send(embed=he1)
 #
-#     @commands.command()  # Не работает выдача ролиы
+#     @commands.command()  # Не работает выдача роли
 #     async def buyrole(self, ctx, count: int = None):
 #         member = ctx.message.author
 #         role = discord.Role.name == '[1]'
@@ -347,7 +336,6 @@ async def plugin(ctx, todo: str = None):
 #         role: discord.Role
 #         member: discord.Member
 #         connection = sqlite3.connect('bot_test.db')
-#         cursor = connection.cursor()
 #         balance = cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id)).fetchone()[0]
 #         connection.commit()
 #         if count == 1:
@@ -380,5 +368,4 @@ async def plugin(ctx, todo: str = None):
     #
     #
 
-
-bot.run(settings['token'])
+bot.run(settings['token'], log_handler=handler)

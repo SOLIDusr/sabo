@@ -4,8 +4,7 @@ import psycopg2 as sql
 from configs.database_config import *
 from discord.ext import commands
 from configs.config import *
-# import random
-# import math
+
 
 
 data_base = sql.connect(
@@ -25,7 +24,7 @@ try:
 
 except Exception as _ex:
 
-    print(f'Error happend while connecting to Database! {Exception}')
+    print(f'Error happend while connecting to Database! {_ex}')
 
 intents = discord.Intents.all()
 
@@ -38,9 +37,10 @@ class Pets(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["питомцы", "кейс с питомцами", "питомец кейс"])
-    async def casepets(self, ctx):
+    async def pets_case(self, ctx):
         moves = ["открыть", "купить", "buy", "open"]
-        user_pets = list(cursor.execute(f"SELECT pet_has FROM users WHERE id = {ctx.author.id}").fetchone()[0])
+        cursor.execute(f"SELECT pet_has FROM users WHERE id = {ctx.author.id}")
+        user_pets = list(cursor.fetchone()[0])
         await ctx.send(f'Хуева кукуева! {user_pets}')
 
 

@@ -1,4 +1,4 @@
 settings = {
-    "token": "token",
+    "token": "",
     "prefix": "/"
 }
