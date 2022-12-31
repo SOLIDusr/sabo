@@ -4,7 +4,7 @@ from configs.config import *
 import time
 import math
 import os
-from logs import *
+from logs import logger, handler
 import psycopg2 as sql
 from configs.database_config import *
 
@@ -37,7 +37,7 @@ try:
 
 except Exception as _ex:
 
-    print(f'Error happend while connecting to Database! {Exception}')
+    logger.info(f'Error happend while connecting to Database! {Exception}')
 
 
 # bot.event

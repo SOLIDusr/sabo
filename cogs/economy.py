@@ -4,15 +4,19 @@ from configs.config import *
 from discord.ext.commands import has_permissions, MissingPermissions
 import psycopg2 as sql
 from configs.database_config import *
+from logs import logger
+
 
 intents = discord.Intents.all()
 
 bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_command=None)
 
+
 global payment1
 global channelid
 global Oplata  # Переменная в которой будет хранится оплаченная за команту сумма
 global vtime
+
 
 data_base = sql.connect(
     host=host,
@@ -28,10 +32,9 @@ try:
 
     cursor = data_base.cursor()
 
-
 except Exception as _ex:
 
-    print(f'Error happend while connecting to Database! {Exception}')
+    logger.info(f'Error happend while connecting to Database! {_ex}')
 
 
 class Economics(commands.Cog):
@@ -43,23 +46,24 @@ class Economics(commands.Cog):
     async def balance(self, ctx, member: discord.Member = None):
 
         if member is not None:
-            pass
+
             try:
 
-                for row in cursor.execute(f'SELECT nickname, money FROM users where id={member.id}'):
+                cursor.execute(f'SELECT nickname, money FROM users where id={member.id}')
+                row = cursor.fetchone()
+                embed = discord.Embed(title=f'Аккаунт пользователя {row[0]}', color=0x42f566)
+                embed.add_field(name='Баланс:', value=f'{row[1]} SH', inline=False)
+                await ctx.send(embed=embed)
 
-                    embed = discord.Embed(title=f'Аккаунт пользователя {row[0]}', color=0x42f566)
-                    embed.add_field(name='Баланс:', value=f'{row[1]} SH', inline=False)
-                    await ctx.send(embed=embed)
+            except Exception as error:
 
-            except Exception as E:
-
-                print(f'money command error: {E}')
+                logger.info(f'money command error: {error}')
                 embed = discord.Embed(title='Оповещение', color=0xFF0000)
                 embed.add_field(name='Оповещение', value='Ошибка при выполнение программы.')
                 await ctx.send(embed=embed)
 
         elif member is None:
+
             cursor.execute(f'SELECT nickname, money FROM users where id={ctx.author.id}')
             response = cursor.fetchone()
 
@@ -70,12 +74,13 @@ class Economics(commands.Cog):
     @commands.command(name="set_money", pass_context=True)
     @has_permissions(manage_roles=True, ban_members=True)
     async def set_money(self, ctx, member: discord.Member, amount: int = None):
+
         if amount < 0:
 
             await ctx.send('Количество не может быть отрицательным!')
-            return None
 
         else:
+
             cursor.execute(f'SELECT money FROM users where id={member.id}')
             row = cursor.fetchone()
             cursor.execute(f'UPDATE users SET money= {int(amount) + row[0]} where id={member.id}')
@@ -97,13 +102,13 @@ class Economics(commands.Cog):
     @commands.command()
     async def profile(self, ctx):
 
-        profile_nick = \
-            cursor.execute('SELECT nickname FROM users WHERE id = {}'.format(ctx.author.id)).fetchone()[0]
-        profile_balance = \
-            cursor.execute('SELECT money FROM users WHERE id = {}'.format(ctx.author.id)).fetchone()[0]
+        cursor.execute('SELECT nickname, money FROM users WHERE id = {}'.format(ctx.author.id))
+        nickname, balance = cursor.fetchone()[0], cursor.fetchone()[1]
+
         embed = discord.Embed(title=f'[Profile]', color=0x42f566)
-        embed.add_field(name='Nickname:', value=f'{profile_nick}', inline=False)
-        embed.add_field(name='Balance:', value=f'{profile_balance} SH', inline=False)
+        embed.add_field(name='Nickname:', value=f'{nickname}', inline=False)
+        embed.add_field(name='Balance:', value=f'{balance} SH', inline=False)
+
         await ctx.send(embed=embed)
 
 
