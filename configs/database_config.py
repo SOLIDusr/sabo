@@ -1,4 +1,4 @@
-host = '.'
+host = ''
 port = ''
 user = ''
 password = ''
