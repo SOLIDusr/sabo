@@ -1,6 +1,6 @@
                                                    **Developer notes** *31.12.2022*
 
-Now postgres perfectly working
+Now postgres perfectly working (Shoud perfectly work...)
 
 
 **[Main.py]** 
@@ -48,3 +48,34 @@ Some of the functions are not working as expected.
 **[On_voice_state_update]**
 
 Some wierd errors were pipping when it was working. Same with your own voice rooms. Code was ***kinda*** working. Rework required
+
+                                                                      **Notes**
+
+       **[FILE LOG]**
+**[main.py]**
+
+No issues
+
+**[logs.py]**
+
+Added logger. On alpha.
+
+**[economics.py]**
+
+No issues
+
+**[info.py]**  
+
+No issues
+
+**[Games.py]**  
+
+No issues anymore
+
+**[pets.py]**
+
+Global rework. User's pets issues
+
+**[shops.py]**
+
+Missing file. Has been deleted in a rage situation... sry
