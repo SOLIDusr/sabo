@@ -36,7 +36,7 @@ class Pets(commands.Cog):
     def __init__(self):
         self.bot = bot
 
-    @commands.command(aliases=["питомцы", "кейс с питомцами", "питомец кейс"])
+    @commands.command()
     async def casepets(self, ctx, move: str = None):
         moves = ["открыть", "купить", "buy", "open"]
         cursor.execute(f"SELECT pet_has FROM users WHERE id = {ctx.author.id}")
@@ -207,19 +207,19 @@ class Pets(commands.Cog):
     async def mypets(self, ctx):
         effects = ''
         cursor.execute(f"SELECT pet_has FROM users WHERE id = {ctx.author.id}")
-        user_pets = list(cursor.fetchone()[0])
+        user_pets = cursor.fetchone()[0]
         cursor.execute(f"SELECT casepets FROM users WHERE id = {ctx.author.id}")
         activepet = cursor.fetchone()[0]
 
-        if 'wolf' in activepet:
+        if activepet == 'wolf':
 
             effects += 'Прибавляет процент от суммы выйгрыша в казино на 7%\n'
 
-        elif 'fox' in activepet:
+        elif activepet == 'fox':
 
             effects += 'Прибавляет 7% SH от времени которое вы находились в голосовом канале.\n'
 
-        elif 'dog' in activepet:
+        elif activepet == 'dog':
 
             effects += 'Возвращает вам 5 % от проигрыша в казино.'
 

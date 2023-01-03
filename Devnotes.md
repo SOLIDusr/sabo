@@ -1,11 +1,8 @@
-                                                   **Developer notes** *31.12.2022*
+#### **Developer notes** *3.1.2022*
 
-Now postgres perfectly working (Shoud perfectly work...)
+#**[Main.py]**
 
-
-**[Main.py]** 
-
-Onvoicestateupdate hasn't been tested yet. Some wierd errors in logger expected. Class CommandsVoice temporary disabled. Reworked system of connected database.
+#Now the bot can automatically delete voices that were not paid for. Function changed from "On_voice_state_update" to "on_ready"
 
 **[Config files]** 
 
@@ -25,11 +22,11 @@ Added info about new pets system
 
 **[pets.py]**
 
-Work still in progress. None of these features are working.
+Final test are comiming. Some errors expected.
 
 **[shops.py]**
 
-Work still in progress. None of these features are working.
+No FiLe
 
 **[logs.py]**
 
@@ -39,7 +36,7 @@ Added logger to log any activity. This function actually on alpha.
 
 **[pets problems]**
 
-Functions are still in development
+Tests!
 
 **[Shop problems]**
 
@@ -47,35 +44,9 @@ Some of the functions are not working as expected.
 
 **[On_voice_state_update]**
 
-Some wierd errors were pipping when it was working. Same with your own voice rooms. Code was ***kinda*** working. Rework required
+No longer exists
 
-                                                                      **Notes**
+**[on_ready.py]**
 
-       **[FILE LOG]**
-**[main.py]**
-
-No issues
-
-**[logs.py]**
-
-Added logger. On alpha.
-
-**[economics.py]**
-
-No issues
-
-**[info.py]**  
-
-No issues
-
-**[Games.py]**  
-
-No issues anymore
-
-**[pets.py]**
-
-Global rework. User's pets issues
-
-**[shops.py]**
-
-Missing file. Has been deleted in a rage situation... sry
+Now the bot can automatically delete voices that were not paid for.
+Voice should work perfect
