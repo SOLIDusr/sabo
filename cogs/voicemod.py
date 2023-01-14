@@ -1,35 +1,36 @@
 import discord
 from discord.ext import commands
-from configs.config import *
 import datetime
 import asyncio
-from discord.ext.commands import has_permissions, MissingPermissions
 import psycopg2 as sql
 from configs.database_config import *
-from logs import logger
+from tools.logs import Log as logger
 
 
 data_base = sql.connect(
-    host=host,
-    user=user,
-    password=password,
-    database=db_name,
-    port=port,
-
-)
+        host=host,
+        user=user,
+        password=password,
+        database=db_name,
+        port=port,
+    )
 data_base.autocommit = False
 
 try:
 
     cursor = data_base.cursor()
 
+
 except Exception as _ex:
 
     logger.info(f'Error happend while connecting to Database! {_ex}')
+    exit()
 
 
+cursor.execute(f'SELECT prefix FROM guilds WHERE id = 780063558482001950')
+prefix = cursor.fetchone()[0]
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=settings['prefix'], intents=intents, help_command=None)
+bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
 cost = 12000
 
 
@@ -47,22 +48,25 @@ class Voices(commands.Cog):
 
         if move not in moves:
 
-            pass
-
+            he1 = discord.Embed(title="[Voice]", colour=discord.Colour(0x3e038c))
+            print('Пришли не туда')
+            he1.add_field(name='Доступные команды:', value="/voice купить(buy)\n/voice закрыть(remove)\n/voice меню(menu)", inline=False)
+            await ctx.send(embed=he1)
+            
         elif move in ['купить, buy']:
-
+            print('Пришли 1')
             cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))  # Присваиваем баланс из бд к переменной
             balance = cursor.fetchone()[0]
             purchase = 5500
-
+            print(move)
             if balance < purchase:
-
+                print('Пришли 2')
                 he1 = discord.Embed(title="[Payment]", colour=discord.Colour(0x3e038c))
                 he1.add_field(name='Ошибка оплаты.', value="Недостаточно средств!", inline=False)
                 await ctx.send(embed=he1)
 
             else:
-
+                print('Пришли 2.5')
                 cursor.execute(f"UPDATE users SET money = money - {purchase} WHERE id={ctx.author.id}")
                 guild = ctx.guild
                 data_base.commit()
@@ -149,6 +153,7 @@ class Voices(commands.Cog):
 
                 cursor.execute(f'UPDATE users SET money = money- {week_cost} WHERE id={ctx.author.id}')
                 cursor.execute(f'UPDATE channels SET account = account - {week_cost}')
+                data_base.commit()
                 he1 = discord.Embed(title="[VoiceManager]", colour=discord.Colour(0x3e038c))
                 he1.add_field(name='Оплата за голосовой канал произведена.',
                               value=f"На счет вашего канала была положна еженедельная сумма в {week_cost}.",

@@ -1,4 +1,0 @@
-settings = {
-    "token": "token",
-    "prefix": "/"
-}

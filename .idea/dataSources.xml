@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="bot_test@portaler.org" uuid="798b3157-c5f9-4e19-ac37-263823a1575d">
+    <data-source source="LOCAL" name="portaler.org" uuid="537a4877-6a7a-4401-8b03-f5ff0437c25f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
