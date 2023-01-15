@@ -9,14 +9,17 @@ from tools.plugins import *
 try:
     
     try:
-        global bot
-        token, prefix = Request.Get.any('token', 'guilds', 'id', '780063558482001950'), Request.Get.any('prefix', 'guilds', 'id', '780063558482001950')
-        intents = discord.Intents.all()
-        bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
+        token = Request.Get.any('token', 'guilds', 'id', '780063558482001950')
+        bot = Request.get_bot()
+        if type(bot) is Exception:
+            logger.critical(f'Could\'nt receve bot variable. Error:\n{bot}')
+            raise discord.errors.DiscordException
+        else:
+            pass
 
         if type(token) is not str:
             logger.error(f'Unable to receve a token. Error:\n{token}')
-            exit(-1)
+            raise discord.errors.ClientException
             
     except(Exception) as _ex:
         logger.error(f'Unable to receve a token. Error:\n{_ex}')
@@ -53,35 +56,6 @@ try:
         logger.info(f"{bot.user.name} started on id {bot.user.id}")
         await bot.change_presence(activity=discord.Game('/help'))
 
-        # while True:
-
-        #     timestamp = datetime.datetime.today()
-        #     cursor.execute(f'SELECT id, last_payment, account FROM channels')
-        #     row = cursor.fetchall()
-        #     week_cost = 12_000
-
-        #     for voice in row:
-
-        #         if (timestamp - voice[1]).days > 7:
-
-        #             print(timestamp)
-
-        #             if voice[2] < week_cost:
-
-        #                 cursor.execute(f'DELETE FROM channels WHERE id = {voice[0]}')
-        #                 data_base.commit()
-
-        #             else:
-
-        #                 cursor.execute(f'UPDATE channels SET account = account - {week_cost} WHERE id = {voice[0]}')
-        #                 cursor.execute(f'UPDATE channels SET last_payment = CURRENT_TIMESTAMP WHERE id = {voice[0]}')
-        #                 data_base.commit()
-
-        #         else:
-
-        #             pass
-
-
     @bot.event
     async def on_member_join(member):
 
@@ -113,3 +87,33 @@ except Exception as _ex:
     logger.fatal('Unable to start the bot!')
     logger.fatal(_ex)
     exit(-1)
+
+
+       # while True:
+
+        #     timestamp = datetime.datetime.today()
+        #     cursor.execute(f'SELECT id, last_payment, account FROM channels')
+        #     row = cursor.fetchall()
+        #     week_cost = 12_000
+
+        #     for voice in row:
+
+        #         if (timestamp - voice[1]).days > 7:
+
+        #             print(timestamp)
+
+        #             if voice[2] < week_cost:
+
+        #                 cursor.execute(f'DELETE FROM channels WHERE id = {voice[0]}')
+        #                 data_base.commit()
+
+        #             else:
+
+        #                 cursor.execute(f'UPDATE channels SET account = account - {week_cost} WHERE id = {voice[0]}')
+        #                 cursor.execute(f'UPDATE channels SET last_payment = CURRENT_TIMESTAMP WHERE id = {voice[0]}')
+        #                 data_base.commit()
+
+        #         else:
+
+        #             pass
+

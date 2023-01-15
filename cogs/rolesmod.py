@@ -1,36 +1,12 @@
 import discord
 from discord.ext import commands
 from discord.ui import Button, View
-import psycopg2 as sql
-from configs.database_config import *
 from tools.logs import Log as logger
+from tools.db_connect import cursor
+from tools.db_request import Request
 
 
-data_base = sql.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name,
-        port=port,
-    )
-data_base.autocommit = False
-
-try:
-
-    cursor = data_base.cursor()
-
-
-except Exception as _ex:
-
-    logger.info(f'Error happend while connecting to Database! {_ex}')
-    exit()
-
-
-cursor.execute(f'SELECT prefix FROM guilds WHERE id = 780063558482001950')
-prefix = cursor.fetchone()[0]
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
-
+bot = Request.get_bot()
 
 class Roles(commands.Cog):
     def __init__(self):
@@ -38,7 +14,7 @@ class Roles(commands.Cog):
 
     @commands.command(aliases=['rolebuy', 'buyrole'])
     async def _rolebuy(self, ctx, num:int = None):
-
+ 
         cursor.execute(f'SELECT id FROM roles_shop')
         idss = cursor.fetchall()
         member:discord.Member = ctx.author
@@ -59,14 +35,10 @@ class Roles(commands.Cog):
 
         else:
 
-            cursor.execute(f'SELECT role_cost, discord_id FROM roles_shop WHERE id = {num}')
-            row = cursor.fetchone()
-            role_cost, discord_id = row[0], row[1]
-            cursor.execute(f'SELECT money FROM users WHERE id = {ctx.author.id}')
-            balance = cursor.fetchone()[0]
+            role_cost, discord_id = Request.Get.role_cost(num), Request.Get.role_discord(num)
+            balance = Request.Get.balance_by_id(member.id)
 
             if balance < role_cost:
-
                 he1 = discord.Embed(title="[RoleShop]", colour=discord.Colour(0x3e038c))
                 he1.add_field(name='Спасибо за покупку!',
                             value="Хотелось бы так сказать, но у вас не хватило средств :(.",
@@ -81,11 +53,10 @@ class Roles(commands.Cog):
                 await ctx.send(embed=he1)
             else:
                 user: discord.Member = ctx.author
-                cursor.execute(f'UPDATE users SET money = money - {role_cost} WHERE id={ctx.author.id}')
+                Request.Update.balance(member.id, -role_cost)
                 role = discord.utils.get(ctx.guild.roles, id=discord_id)
                 await user.add_roles(role)
                 
-                data_base.commit()
                 he1 = discord.Embed(title="[RoleShop]", colour=discord.Colour(0x3e038c))
                 he1.add_field(name='Вниание!', value="Система искренне завидует вашей покупке.", inline=False)
                 await ctx.send(embed=he1)
@@ -108,11 +79,8 @@ class Roles(commands.Cog):
                 choise_ids = cursor.fetchall()
 
                 for item in choise_ids:
-                    
-                    cursor.execute(f"SELECT role_cost FROM roles_shop WHERE id = {item[0]}")
-                    choise_cost = cursor.fetchone()[0]
-                    cursor.execute(f'SELECT role_name FROM roles_shop WHERE id = {item[0]}')
-                    name = cursor.fetchone()[0]
+                    choise_cost = Request.Get.role_cost(item[0])
+                    name = Request.Get.role_name(item[0])
 
                     embi.add_field(name=f'Роль №{item[0]} - {name}', value=f'Цена - {choise_cost} SH',
                                    inline=False)
@@ -158,8 +126,7 @@ class Roles(commands.Cog):
 
         colours = ['red', 'purple', 'green', 'blue']
 
-        cursor.execute(f'SELECT money FROM users WHERE id = {ctx.author.id}')
-        balance = cursor.fetchone()[0]
+        balance = Request.Get.balance_by_id(member.id)
 
         if (role_name is None or role_colour is None or role_colour not in colours) or len(role_name) >= 16 or role_name.lower in FORBIDDEN:
 
@@ -169,7 +136,7 @@ class Roles(commands.Cog):
             embi.add_field(name='Цвета', value="красный - red\n\nфиолетовый - purple\nСиний -  blue\nЗеленый - green.", inline=False)
             await ctx.send(embed=embi)
 
-        elif balance < 5_500_000:
+        elif balance < 500_000:
 
             embi = discord.Embed(title="[RoleShop]", colour=discord.Colour(0x3e038c))
             embi.add_field(name='Недостаточно средств!', value=f"Не хватает - {500_000 - balance}", inline=False)
@@ -178,7 +145,7 @@ class Roles(commands.Cog):
         else:
 
             guild = ctx.guild
-            cursor.execute(f'UPDATE users SET money = money - 5500000 WHERE id = {ctx.author.id}')
+            Request.Update.balance(member.id, -500000)
             role = await guild.create_role(name=role_name, colour=role_colour, hoist=True, mentionable=True)
             await member.add_roles(role)
             emb=discord.Embed(

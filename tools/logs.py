@@ -8,7 +8,7 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
     format = "[%(asctime)s][%(levelname)s] %(message)s"
-
+    
     FORMATS = {
         logging.DEBUG: format + reset,
         logging.INFO: blue + format + reset,
@@ -29,3 +29,4 @@ Channel = logging.StreamHandler()
 Channel.setLevel(logging.INFO)
 Channel.setFormatter(CustomFormatter())
 Log.addHandler(Channel)
+logging.basicConfig(filename='logfile.log', encoding='utf-8', level=logging.DEBUG)

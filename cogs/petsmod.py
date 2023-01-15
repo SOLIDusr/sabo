@@ -1,37 +1,14 @@
-import discord
 from discord.ui import Select, View
+import discord
 from discord.ext import commands
-import random
-import psycopg2 as sql
-from configs.database_config import *
+from discord.ext.commands import has_permissions, MissingPermissions
 from tools.logs import Log as logger
+from tools.db_connect import cursor
+from tools.db_request import Request
+import random
 
 
-data_base = sql.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name,
-        port=port,
-    )
-data_base.autocommit = False
-
-try:
-
-    cursor = data_base.cursor()
-
-
-except Exception as _ex:
-
-    logger.info(f'Error happend while connecting to Database! {_ex}')
-    exit()
-
-
-cursor.execute(f'SELECT prefix FROM guilds WHERE id = 780063558482001950')
-prefix = cursor.fetchone()[0]
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
-
+bot = Request.get_bot()
 
 class Pets(commands.Cog):
 
@@ -42,29 +19,21 @@ class Pets(commands.Cog):
     async def pets(self, ctx, move: str = None):
         moves = ["открыть", "купить", "buy", "open", "select", "выбрать", "active"]
         effects = ''
-        cursor.execute(f'SELECT pet_has, casepets, money , pet_active FROM users WHERE id={ctx.author.id}')
-        row = cursor.fetchone()
         member = ctx.author
-        user_pets, casepets, balance, active_pet = row[0], row[1], row[2], row[3]
+        user_pets, casepets, balance, active_pet = Request.Get.pets(member.id),\
+                            Request.Get.casepets(member.id), Request.Get.balance_by_id(member.id), Request.Get.pet_active(member.id)
 
         if active_pet == 'wolf':
-
             effects += 'Прибавляет процент от суммы выйгрыша в казино на 7%\n'
-
         elif active_pet == 'fox':
-
             effects += 'Прибавляет 7% SH от времени которое вы находились в голосовом канале.\n'
-
         elif active_pet == 'dog':
-
             effects += 'Возвращает вам 5 % от проигрыша в казино.'
-
         else :
-
             effects = 'У вас нет активного питомца...'
-        
+
         if move is None:
-            
+
             embed = discord.Embed(title='[Pets]',color=member.color, timestamp=ctx.message.created_at)
             embed.set_author(name=f'{member}')
             embed.set_thumbnail(url=member.avatar.url)
@@ -88,17 +57,14 @@ class Pets(commands.Cog):
 
         elif move in ['окрыть', 'open']:
 
-            cursor.execute(f"SELECT casepets FROM users WHERE id = {ctx.author.id}")
-            casepets = cursor.fetchone()[0]
+            casepets = Request.Get.casepets(member.id)
 
             val = 1
 
             if casepets >= 1:
-                cursor.execute(f"UPDATE users SET casepets = casepets - {val} WHERE id = {ctx.author.id}")
-                data_base.commit()
-                rand = random.randint(0, 50)
 
-                if rand in range(0, 50):
+                rand = random.randint(0, 50)
+                if rand == 6:
 
                     if 'wolf' in user_pets:
 
@@ -107,13 +73,11 @@ class Pets(commands.Cog):
                                                            "не был потрачен",
                                       inline=False)
                         await ctx.send(embed=emb)
-                        cursor.execute(f"UPDATE users SET casepets = casepets + {val} WHERE id = {ctx.author.id}")
-                        data_base.commit()
 
                     else:
+                        Request.Update.casepets(member.id, -val)
                         user_pets.append('wolf')
-                        cursor.execute('UPDATE users SET pet_has = \'{{{}}}\' WHERE id = {}'.format(','.join(user_pets), ctx.author.id))
-                        data_base.commit()
+                        Request.Update.pet_has(member.id, user_pets)
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='Поздравляем.', value="Вам выпал питомец 'Волк'.", inline=False)
                         emb.add_field(name='Питомец "Волк".',
@@ -137,13 +101,11 @@ class Pets(commands.Cog):
                                                            "Кейс не потрачен!",
                                       inline=False)
                         await ctx.send(embed=emb)
-                        cursor.execute(f"UPDATE users SET casepets = casepets + {val} WHERE id = {ctx.author.id}")
-                        data_base.commit()
 
                     else:
+                        Request.Update.casepets(member.id, -val)
                         user_pets.append('fox')
-                        cursor.execute('UPDATE users SET pet_has = \'{{{}}}\' WHERE id = {}'.format(','.join(user_pets), ctx.author.id))
-                        data_base.commit()
+                        Request.Update.pet_has(member.id, user_pets)
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='Поздравляем.', value="Вам выпал питомец 'Лиса'.", inline=False)
                         emb.add_field(name='Питомец "Лиса".',
@@ -167,15 +129,12 @@ class Pets(commands.Cog):
                         emb.add_field(name='[Итог]', value="Вам бы выпал питомец 'Собака', но он у вас уже есть."
                                                            "Кейс не потрачен",
                                       inline=False)
-                        cursor.execute(f"UPDATE users SET casepets = casepets + {val} WHERE id = {ctx.author.id}")
-                        data_base.commit()
                         await ctx.send(embed=emb)
 
                     else:
-
+                        Request.Update.casepets(member.id, -val)
                         user_pets.append('dog')
-                        cursor.execute('UPDATE users SET pet_has = \'{{{}}}\' WHERE id = {}'.format(','.join(user_pets), ctx.author.id))
-                        data_base.commit()
+                        Request.Update.pet_has(member.id, user_pets)
                         emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                         emb.add_field(name='Поздравляем.', value="Вам выпал питомец 'Собака'.", inline=False)
                         emb.add_field(name='Питомец "Собака".',
@@ -215,10 +174,8 @@ class Pets(commands.Cog):
                 await ctx.send(embed=emb)
 
             elif balance >= price:
-
-                cursor.execute("UPDATE users SET money = money - {} WHERE id = {}".format(price, ctx.author.id))
-                cursor.execute("UPDATE users SET casepets = casepets + {} WHERE id = {}".format(val, ctx.author.id))
-                data_base.commit()
+                Request.Update.balance(member.id, -price)
+                Request.Update.casepets(member.id, val)
                 emb = discord.Embed(title="[CasePets]", colour=discord.Colour(0x3e038c))
                 emb.add_field(name='Успешно.',
                               value="Кейс с питомцами был куплен, для открытия введите '/casepets открыть"
@@ -228,9 +185,7 @@ class Pets(commands.Cog):
 
         elif move in ['select', 'выбрать', 'active']:
 
-            cursor.execute(f'SELECT pet_has, pet_active FROM users WHERE id={ctx.author.id}')
-            row = cursor.fetchone()
-            user_pets, active_pet = row[0], row[1]
+            user_pets, active_pet = Request.Get.pets(member.id), Request.Get.pet_active(member.id)
 
             select = Select(
 
@@ -254,21 +209,17 @@ class Pets(commands.Cog):
             async def my_callback(interaction):  # Если namepet active - выбран данный питомец
 
                 if select.values[0] not in user_pets:
-
                     await ctx.send('У вас нет данного питомца.')
 
                 else:
 
                     if select.values[0] == active_pet:
-
                         await ctx.send('Данный питомец уже установлен как активный!')
-
-                    else:
-
-                        cursor.execute(f"UPDATE users SET pet_active = '{select.values[0]}' WHERE id = {ctx.author.id}")
-                        await ctx.send('Активный питомец установлен.')
-                        data_base.commit()
                         
+                    else:
+                        Request.Update.pet_active(member.id, select.values[0]) 
+                        await ctx.send('Активный питомец установлен.')
+
                 await interaction.response.defer()
 
             select.callback = my_callback

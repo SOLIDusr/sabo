@@ -1,35 +1,12 @@
 import discord
 from discord.ext import commands
-import psycopg2 as sql
-from configs.database_config import *
+from discord.ext.commands import has_permissions, MissingPermissions
 from tools.logs import Log as logger
+from tools.db_connect import cursor
+from tools.db_request import Request
 
 
-data_base = sql.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=db_name,
-        port=port,
-    )
-data_base.autocommit = False
-
-try:
-
-    cursor = data_base.cursor()
-
-
-except Exception as _ex:
-
-    logger.info(f'Error happend while connecting to Database! {_ex}')
-    exit()
-
-
-cursor.execute(f'SELECT prefix FROM guilds WHERE id = 780063558482001950')
-prefix = cursor.fetchone()[0]
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
-
+bot = Request.get_bot()
 
 class Info(commands.Cog):
 

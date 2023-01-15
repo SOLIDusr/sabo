@@ -4,14 +4,9 @@ from discord.ext.commands import has_permissions, MissingPermissions
 from tools.logs import Log as logger
 from tools.db_connect import cursor
 from tools.db_request import Request
-from main import bot
 
 
-# cursor.execute(f'SELECT prefix FROM guilds WHERE id = 780063558482001950')
-# prefix = cursor.fetchone()[0]
-# intents = discord.Intents.all()
-# bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
-
+bot = Request.get_bot()
 
 class Economics(commands.Cog):
 
