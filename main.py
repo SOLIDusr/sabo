@@ -6,6 +6,7 @@ from tools.db_connect import cursor
 from tools.db_request import Request
 from tools.plugins import *
 
+
 try:
     
     try:
@@ -28,7 +29,7 @@ try:
     # bot.event
     @bot.event
     async def on_ready():
-
+        
         for filename in os.listdir("./cogs"):  # перебирает все файлы в выбранной папке
             if filename.endswith(".py"):
                 await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
@@ -87,33 +88,3 @@ except Exception as _ex:
     logger.fatal('Unable to start the bot!')
     logger.fatal(_ex)
     exit(-1)
-
-
-       # while True:
-
-        #     timestamp = datetime.datetime.today()
-        #     cursor.execute(f'SELECT id, last_payment, account FROM channels')
-        #     row = cursor.fetchall()
-        #     week_cost = 12_000
-
-        #     for voice in row:
-
-        #         if (timestamp - voice[1]).days > 7:
-
-        #             print(timestamp)
-
-        #             if voice[2] < week_cost:
-
-        #                 cursor.execute(f'DELETE FROM channels WHERE id = {voice[0]}')
-        #                 data_base.commit()
-
-        #             else:
-
-        #                 cursor.execute(f'UPDATE channels SET account = account - {week_cost} WHERE id = {voice[0]}')
-        #                 cursor.execute(f'UPDATE channels SET last_payment = CURRENT_TIMESTAMP WHERE id = {voice[0]}')
-        #                 data_base.commit()
-
-        #         else:
-
-        #             pass
-

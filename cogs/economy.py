@@ -61,7 +61,6 @@ class Economics(commands.Cog):
             embed.add_field(name='Баланс:', value=f'{balance} SH', inline=False)
             await ctx.send(embed=embed)
 
-
     @commands.command(name="set_money", pass_context=True)
     @has_permissions(manage_roles=True, ban_members=True)
     async def set_money(self, ctx, member: discord.Member, amount: int = None):
@@ -101,7 +100,7 @@ class Economics(commands.Cog):
 
         nickname = member.name
         balance = Request.Get.balance_by_id(member.id)
-        discord_channel_id = Request.Get.channel_discord_by_owner(member.id)
+        discord_channel_id = Request.Get.channel_discordid(member.id)
         if balance is Exception or discord_channel_id is Exception:
             logger.error(f'Error in economics on lines 108- 109. Error:\n{balance, discord_channel_id}')
             ctx.send('Ошибка выполнения команды! Свяжитесь с администратором.')
@@ -113,19 +112,20 @@ class Economics(commands.Cog):
 
         else:
 
-            channelz = f'<#{discord_channel_id[0]}>'
-            
+            channelz = f'<#{discord_channel_id}>'
+        
+        lvl, voicetime = Request.Get.lvl(member.id), Request.Get.voicetime(member.id)
         embed = discord.Embed(color=member.color, timestamp=ctx.message.created_at)
         embed.set_author(name=f'{member}')
         embed.set_thumbnail(url=member.avatar.url)
         embed.set_footer(text=f'Запрошено пользователем - {ctx.author}', icon_url=ctx.author.avatar.url)
-        embed.add_field(name='Имя:👤', value=nickname, inline=False)
-        embed.add_field(name='Баланс:🪙', value=balance, inline=False)
-        embed.add_field(name='Роль:🛡', value=member.top_role.mention, inline=False)
-        embed.add_field(name='Присоеденился к Discord:🕔', value=member.created_at, inline=False)
-        embed.add_field(name='На сервере с:🕔', value=member.joined_at, inline=False)
-        embed.add_field(name='Voice Room:🕪', value=f'{channelz}', inline=False)
-
+        embed.add_field(name='Имя👤', value=nickname, inline=False)
+        embed.add_field(name='Баланс🪙', value=balance, inline=False)
+        embed.add_field(name='Уровень🏆', value=lvl, inline = False)
+        embed.add_field(name='Время в 🎤', value=voicetime, inline = False)
+        embed.add_field(name='Роль🛡', value=member.top_role.mention, inline=False)
+        embed.add_field(name='Присоеденился к Discord🕔', value=member.created_at, inline=False)
+        embed.add_field(name='На сервере с🕔', value=member.joined_at, inline=False)
         await ctx.send(embed=embed) 
 
 # noinspection PyShadowingNames

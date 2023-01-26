@@ -22,11 +22,10 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
 
-
+logging.basicConfig(filename='test.log', encoding='utf-8', level=logging.DEBUG)
 Log = logging.getLogger()
 Log.setLevel(logging.INFO)
 Channel = logging.StreamHandler()
 Channel.setLevel(logging.INFO)
 Channel.setFormatter(CustomFormatter())
 Log.addHandler(Channel)
-logging.basicConfig(filename='logfile.log', encoding='utf-8', level=logging.DEBUG)

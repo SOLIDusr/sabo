@@ -1,6 +1,6 @@
 from tools.db_connect import cursor
 import psycopg2 as sql
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord.ext import commands
 import discord
 import random
@@ -131,7 +131,7 @@ class Request():
             
             """
             try:
-                cursor.execute(f'SELECT {column} FROM {table} WHERE {indexer} = {value}')
+                cursor.execute(f"SELECT {column} FROM {table} WHERE {indexer} = {value}")
                 return cursor.fetchone()[0]
 
             except (Exception, sql.Error) as _ex:
@@ -150,7 +150,7 @@ class Request():
             User's balance :type:`int` or :type:`Exception`
             """
             try:
-                cursor.execute(f'SELECT balance FROM users WHERE id = {id}')
+                cursor.execute(f'SELECT money FROM users WHERE id = {id}')
                 return cursor.fetchone()[0]
 
             except (Exception, sql.Error) as _ex:
@@ -167,7 +167,7 @@ class Request():
             User's balance :type:`int` or :type:`Exception`
             """
             try:
-                cursor.execute(f'SELECT balance FROM users WHERE nickname = {name}')
+                cursor.execute(f'SELECT money FROM users WHERE nickname = {name}')
                 return cursor.fetchone()[0]
 
             except (Exception, sql.Error) as _ex:
@@ -207,7 +207,7 @@ class Request():
             except (Exception, sql.Error) as _ex:
                 return _ex
         
-        def voicetime(id: int) -> datetime | Exception:
+        def voicetime(id: int):
             """
             Arguments
             ---------
@@ -215,12 +215,11 @@ class Request():
 
             Returns
             --------
-            User's time in the voice :type:`datetime` or :type:`Exception`
+            User's time in the voice :type:`timedelta` or :type:`Exception`
             """
             try:
                 cursor.execute(f'SELECT voicetime FROM users WHERE id = {id}')
                 return cursor.fetchone()[0]
-
             except (Exception, sql.Error) as _ex:
                 return _ex
         
@@ -274,7 +273,40 @@ class Request():
 
             except (Exception, sql.Error) as _ex:
                 return _ex
+        
+        def lvl(id: int) -> int | Exception:
+            """
+            Arguments
+            ---------
+            id :type:`int` - Discord ID of a Member
 
+            Returns
+            --------
+            User's lvl :type:`int` or :type:`Exception`
+            """
+            try:
+                cursor.execute(f'SELECT lvl FROM users WHERE id = {id}')
+                return cursor.fetchone()[0]
+
+            except (Exception, sql.Error) as _ex:
+                return _ex
+
+        def exp(id: int) -> int | Exception:
+            """
+            Arguments
+            ---------
+            id :type:`int` - Discord ID of a Member
+
+            Returns
+            --------
+            User's exp :type:`str` or :type:`Exception`
+            """
+            try:
+                cursor.execute(f'SELECT exp FROM users WHERE id = {id}')
+                return cursor.fetchone()[0]
+
+            except (Exception, sql.Error) as _ex:
+                return _ex
 #  -------------------------------Casino----------------------------------------------------------
 
         def jackpot(server_id: int) -> int | Exception:
@@ -498,12 +530,10 @@ class Request():
             except (Exception, sql.Error) as _ex:
                 return _ex
         
-        def voicetime(id: int, value: datetime) -> bool | Exception:
+        def voicetime(id: int, value: timedelta) -> bool | Exception:
             try:
-                insert_query = """ INSERT INTO users (voicetime)
-                                              VALUES (%s) WHERE id = {%s}"""
-                item_tuple = (value, id)
-                cursor.execute(insert_query, item_tuple)
+        
+                cursor.execute('UPDATE users SET voicetime = (%s) WHERE id = %s', (value, id))
                 return True
 
             except (Exception, sql.Error) as _ex:
@@ -613,6 +643,31 @@ class Request():
             except (Exception, sql.Error) as _ex:
                 return _ex
 
+        def lvl(id: int, adding:int) -> bool | Exception:
+            try:
+                cursor.execute(f"UPDATE users SET lvl = '{adding}' WHERE id = {id}")
+                return True
+
+            except (Exception, sql.Error) as _ex:
+                return _ex
+        
+        def exp(id: int, adding:str) -> bool | Exception:
+            try:
+                cursor.execute(f"UPDATE users SET exp = '{adding}' WHERE id = {id}")
+                return True
+
+            except (Exception, sql.Error) as _ex:
+                return _ex
+        
+        def voicetime(id: int, value: timedelta) -> bool | Exception:
+            try:
+        
+                cursor.execute('UPDATE users SET voicetime = voicetime + (%s) WHERE id = %s', (value, id))
+                return True
+
+            except (Exception) as _ex:
+                return _ex
+        
 # ------------------------------------channels------------------------------------------------
 
         def channel_account_by_ownerid(ownerid: int, adding:int) -> bool | Exception:

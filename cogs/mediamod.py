@@ -1,3 +1,5 @@
+#  Игровая начинка бота
+#  Казино/Рулетка/ Кейсы/ Слоты
 import discord
 import random
 from discord.ext import commands
@@ -5,7 +7,7 @@ from discord.ext.commands import has_permissions, MissingPermissions
 from tools.logs import Log as logger
 from tools.db_connect import cursor
 from tools.db_request import Request
-from tools.rs_gamble import Gamble
+
 
 bot = Request.get_bot()
 
@@ -55,7 +57,7 @@ class Gambling(commands.Cog):
 
 
         else:
-            response = Gamble.bet(member, amount, 'Казино')
+            response = Request.Update.balance(member.id, -amount)
             if number < 50:
                 if response is Exception:
                     ctx.send('Произошла ошибка! Уведомите Администратора.')
@@ -64,10 +66,9 @@ class Gambling(commands.Cog):
                     embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                     embed.add_field(name='Вы проиграли в казино, у вас отняли:', value=f'{amount} SH', inline=False)
                     await ctx.send(embed=embed)
-                    Gamble.loose(member)
 
             elif number == 93:
-                response = Gamble.win(member, jackpot, 'Казино')
+                response = Request.Update.balance(member.id, jackpot+amount)
                 if response is Exception:
                     ctx.send('Произошла ошибка! Уведомите Администратора.')
                     logger.error(f'Error occured while updating variable! Error:\n{response}')
@@ -79,7 +80,7 @@ class Gambling(commands.Cog):
 
 
             else:
-                response = Gamble.win(member, amount, 'Казино')
+                Request.Update.balance(member.id, amount*2)
                 if response is Exception:
                     ctx.send('Произошла ошибка! Уведомите Администратора.')
                     logger.error(f'Error occured while updating variable! Error:\n{response}')
@@ -115,7 +116,7 @@ class Gambling(commands.Cog):
             await ctx.send("Недостаточно :leaves:, иди на работу.")
 
         else:
-            Gamble.bet(member.id, amount, "рулетка")
+            Request.Update.balance(member.id, -amount)
             if count != number:
                 
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
@@ -123,12 +124,11 @@ class Gambling(commands.Cog):
                 embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
                 await ctx.send(embed=embed)
                 amount = 0 - amount
-                Gamble.loose(member)
 
 
             elif count == number:
 
-                Gamble.win(member.id, amount*36, 'Рулетка')
+                Request.Update.balance(member.id, amount*36)
                 embed = discord.Embed(title=f'[CASINO]', color=0x42f566)
                 embed.add_field(name='Поздравляю! Вы выйграли:', value=f'{amount * 36} SH', inline=False)
                 embed.add_field(name='Выпало число:', value=f'{number} SH', inline=False)
@@ -169,31 +169,30 @@ class Gambling(commands.Cog):
                     emb.add_field(name='Вы успено открыли кейс.', value="К сожалению вам ничего не выпало.",
                                   inline=False)
                     await ctx.send(embed=emb)
-                    Gamble.loose(member)
 
                 elif 71 <= rand <= 80:
 
-                    Gamble.win(member.id, 400_000, 'case')
+                    Request.Update.balance(member.id, 400_000)
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успено открыли кейс.', value="Вам выпало 400.000SH", inline=False)
                     await ctx.send(embed=emb)
 
                 elif 81 <= rand <= 90:
 
-                    Gamble.win(member.id, 800_000, 'case')
+                    Request.Update.balance(member.id, 800_000)
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успено открыли кейс.', value="Вам выпало 800.000SH", inline=False)
                     await ctx.send(embed=emb)
 
                 elif 91 <= rand <= 95:
-                    Gamble.win(member.id, 1_600_000, 'case')
+                    Request.Update.balance(member.id, 1_600_000)
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успешно открыли кейс.', value="Вам выпало 1.600.000SH", inline=False)
                     await ctx.send(embed=emb)
 
                 elif 96 <= rand <= 100:
 
-                    Gamble.win(member.id, 5_555_555, 'case')
+                    Request.Update.balance(member.id, 5_555_555)
                     emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                     emb.add_field(name='Вы успешно открыли кейс.', value="Вам выпало 5.555.555SH", inline=False)
                     await ctx.send(embed=emb)
@@ -218,53 +217,23 @@ class Gambling(commands.Cog):
             elif balance >= cent:
                 
                 Request.Update.balance(member.id, -cent)
-                Request.Update.keys(member.id, -val)
+                Request.Update.keys(member.id, val)
                 emb = discord.Embed(title="[CASE]", colour=discord.Colour(0x3e038c))
                 emb.add_field(name='Успешно.', value="Кейс был куплен, для открытия введите '"
                                                      "/case открыть или /case open'.", inline=False)
                 await ctx.send(embed=emb)
 
-    @commands.command()
-    async def slots(self, ctx, amount: int = None):
-        choices = ("🌊", "💵", "⚡", "💎", "🌪","🔥")
-        num = random.choice(choices)
-        num2 = random.choice(choices)
-        num3 = random.choice(choices)
-        cursor.execute("SELECT money FROM users WHERE id = {}".format(ctx.author.id))
-        balance = cursor.fetchone()[0] # Баланс из базы данных = переменной balance
-        # if amount > balance:
-        #     await ctx.send(embed = discord.Embed(
-        #         description = 
-        #         f"**[Slots]**" + '\n' +
-        #         "----------------------------------------------" + '\n' +
-        #         f"**Недостаточно средств.**" + '\n' +
-        #         "----------------------------------------------"))
-        # elif amount is None:
-        #     await ctx.send(embed = discord.Embed(
-        #         description = 
-        #         f"**[Slots]**" + '\n' +
-        #         "----------------------------------------------" + '\n' +
-        #         f"**Укажите ставку.**" + '\n' +
-        #         "----------------------------------------------"))
-        # elif amount <= 0:
-        #     await ctx.send(embed = discord.Embed(
-        #         description = 
-        #         f"**[Slots]**" + '\n' +
-        #         "----------------------------------------------" + '\n' +
-        #         f"**Ставка должна быть больше 0**" + '\n' +
-        #         "----------------------------------------------"))
-        # else:
-        #     if  num == num2 == num3:
-        #         await ctx.send(embed = discord.Embed(
-        #             description = 
-        #             f"**[Slots]**" + '\n' +
-        #             "----------------------------------------------" + '\n' +
-        #             f"**Сыграли все три слота!**" + '\n' +
-        #             f"**Вы проиграли , выпало: {num}"+ "|"+ f"{num2}"+ "|"+f"{num3}**" + '\n' +
-        #             f"**Выйгрышь: {amount*10}**" + '\n' +
-        #             "----------------------------------------------"))
+    # @commands.command()
+    # async def slots(self, ctx, amount: int = None):
+    #     member: discord.Member = ctx.author
+    #     choices = ["🪙", "💵", "⚡", "💎","🔥", " "]
+    #     bonus_choise = "👑"
 
-    
+    #     num = random.choice(choices)
+    #     num2 = random.choice(choices)
+    #     num3 = random.choice(choices)
+    #     balance = Request.Get.balance_by_id(member)
+        
 # noinspection PyShadowingNames
 async def setup(bot):
     await bot.add_cog(Gambling())
