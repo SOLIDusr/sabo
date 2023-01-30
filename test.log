@@ -1,0 +1,99 @@
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: c698c813e17ba072bd7f3adfb65a52f8).
+INFO:root:Extension economy.py loaded
+INFO:root:Extension info.py loaded
+INFO:root:Extension mediamod.py loaded
+INFO:root:Extension moderation.py loaded
+INFO:root:Extension rolesmod.py loaded
+INFO:root:Connected to server, id is: 780063558482001950
+WARNING:root:Wait until database fully fetched
+INFO:root:Database Full
+INFO:root:sudo started on id 962062144789155960
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: 21ad4819a0cc9b96460630c6e6c9843e).
+INFO:root:Extension economy.py loaded
+INFO:root:Extension info.py loaded
+INFO:root:Extension mediamod.py loaded
+INFO:root:Extension moderation.py loaded
+INFO:root:Extension rolesmod.py loaded
+INFO:root:Connected to server, id is: 780063558482001950
+WARNING:root:Wait until database fully fetched
+INFO:root:Database Full
+INFO:root:sudo started on id 962062144789155960
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: 4db86c93d3bd09205c4ab7f84db395fb).
+INFO:root:Extension economy.py loaded
+INFO:root:Extension info.py loaded
+INFO:root:Extension mediamod.py loaded
+INFO:root:Extension moderation.py loaded
+INFO:root:Extension rolesmod.py loaded
+INFO:root:Connected to server, id is: 780063558482001950
+WARNING:root:Wait until database fully fetched
+INFO:root:Database Full
+INFO:root:sudo started on id 962062144789155960
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: 1359cec1b03ced1473bd64044c780dd0).
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: 976e5a1cb17e25ee709f3b644ec769b0).
+ERROR:discord.client:Ignoring exception in on_ready
+Traceback (most recent call last):
+  File "C:\Users\basta\AppData\Roaming\Python\Python311\site-packages\discord\ext\commands\bot.py", line 934, in _load_from_module_spec
+    spec.loader.exec_module(lib)  # type: ignore
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap_external>", line 936, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "d:\workspace\sabo\cogs\economy.py", line 45
+    elif member is None:
+    ^^^^
+SyntaxError: invalid syntax
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\basta\AppData\Roaming\Python\Python311\site-packages\discord\client.py", line 409, in _run_event
+    await coro(*args, **kwargs)
+  File "d:\workspace\sabo\main.py", line 35, in on_ready
+    await bot.load_extension(f"cogs.{filename[:-3]}")  # загрузка КОГов в основной файл
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\basta\AppData\Roaming\Python\Python311\site-packages\discord\ext\commands\bot.py", line 1012, in load_extension
+    await self._load_from_module_spec(spec, name)
+  File "C:\Users\basta\AppData\Roaming\Python\Python311\site-packages\discord\ext\commands\bot.py", line 937, in _load_from_module_spec
+    raise errors.ExtensionFailed(key, e) from e
+discord.ext.commands.errors.ExtensionFailed: Extension 'cogs.economy' raised an error: SyntaxError: invalid syntax (economy.py, line 45)
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: db343af900c3e811d9ccaeffb9e7a5f2).
+INFO:root:Extension economy.py loaded
+INFO:root:Extension info.py loaded
+INFO:root:Extension mediamod.py loaded
+INFO:root:Extension moderation.py loaded
+INFO:root:Extension rolesmod.py loaded
+INFO:root:Connected to server, id is: 780063558482001950
+WARNING:root:Wait until database fully fetched
+INFO:root:Database Full
+INFO:root:sudo started on id 962062144789155960
+INFO:root:Database connected
+INFO:discord.client:logging in using static token
+INFO:discord.gateway:Shard ID None has connected to Gateway (Session ID: 2efdc51dec011ba461ee569efc35a531).
+ERROR:discord.ext.commands.bot:Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "balance" is not found
+ERROR:discord.ext.commands.bot:Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "balance" is not found
+ERROR:discord.ext.commands.bot:Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "balance" is not found
+INFO:root:Extension economy.py loaded
+INFO:root:Extension info.py loaded
+INFO:root:Extension mediamod.py loaded
+INFO:root:Extension moderation.py loaded
+INFO:root:Extension rolesmod.py loaded
+INFO:root:Connected to server, id is: 780063558482001950
+WARNING:root:Wait until database fully fetched
+INFO:root:Database Full
+INFO:root:sudo started on id 962062144789155960

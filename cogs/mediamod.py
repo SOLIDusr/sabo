@@ -1,5 +1,3 @@
-#  Игровая начинка бота
-#  Казино/Рулетка/ Кейсы/ Слоты
 import discord
 import random
 from discord.ext import commands
@@ -223,16 +221,44 @@ class Gambling(commands.Cog):
                                                      "/case открыть или /case open'.", inline=False)
                 await ctx.send(embed=emb)
 
-    # @commands.command()
-    # async def slots(self, ctx, amount: int = None):
-    #     member: discord.Member = ctx.author
-    #     choices = ["🪙", "💵", "⚡", "💎","🔥", " "]
-    #     bonus_choise = "👑"
+    @commands.command(aliases = ['slots', 'slot', 'слоты'])
+    async def _slots(self, ctx, amount: int = None):
+        member: discord.Member = ctx.author
+        choices = ["🪙", "💵", "⚡", "💎","🔥", " "]
+        balance = Request.Get.balance_by_id(member)
+        mult_points = 1
+        combo = 0
+        #  slots statement
+        slots = []
+        for n in range(25):
+            slots.append(random.choice(choices))
+        
+        #  combos
 
-    #     num = random.choice(choices)
-    #     num2 = random.choice(choices)
-    #     num3 = random.choice(choices)
-    #     balance = Request.Get.balance_by_id(member)
+        #  all in
+        for i in range(1, 5):
+            
+            for item in range(0, 3):
+                if slots[item*i] == slots[item*i+1]:
+                    combo += 1
+                    mult_points += 5
+                else:break
+                if combo == 5:
+                    print('win')
+                else:print('loose')
+        #  lightning
+        for i in range(0, 3):
+            if slots[0 + 5 * i] == slots[1] == slots[2] == slots[7] == slots[8] == slots[9]:
+                mult_points += 0.3
+                combo += 1
+    
+        if combo in range(2, 3):
+            mult_points += 30
+
+        if combo == 4:
+            mult_points += 50
+        
+        
         
 # noinspection PyShadowingNames
 async def setup(bot):

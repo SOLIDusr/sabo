@@ -42,9 +42,11 @@ class Economics(commands.Cog):
                     await ctx.send(embed=embed) 
                 
                 else:
-
-                    embed = discord.Embed(title=f'Аккаунт пользователя {name}', color=0x42f566)
-                    embed.add_field(name='Баланс:', value=f'{balance} SH', inline=False)
+                    balance = Request.Get.balance_by_id(member.id)
+                    embed=discord.Embed(title=" ", description=f"**{member}**", color=0x00ff9d)
+                    embed.set_author(name="[Balance]")
+                    embed.add_field(name="**Баланс**", value=f'**{balance}**', inline=False)
+                    embed.set_footer(text=f"Запросил - {ctx.author}")
                     await ctx.send(embed=embed)
 
             except Exception as error:
@@ -57,8 +59,9 @@ class Economics(commands.Cog):
         elif member is None:
             member = ctx.author
             balance = Request.Get.balance_by_id(member.id)
-            embed = discord.Embed(title=f'Аккаунт пользователя {member.name}', color=0x42f566)
-            embed.add_field(name='Баланс:', value=f'{balance} SH', inline=False)
+            embed=discord.Embed(title=" ", description=f"**{member}**", color=0x00ff9d)
+            embed.set_author(name="[Balance]")
+            embed.add_field(name="**Баланс**", value=f'**{balance}**', inline=False)
             await ctx.send(embed=embed)
 
     @commands.command(name="set_money", pass_context=True)
